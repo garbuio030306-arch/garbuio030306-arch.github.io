@@ -1,0 +1,36 @@
+{
+  "name": "giovi365",
+  "intro": "Fixed income and real estate research: rate forecasting, macro sensitivity, and the honest diagnostics that say how far to trust each model.",
+  "links": [
+    { "label": "GitHub", "url": "https://github.com/garbuio030306-arch" }
+  ],
+  "projects": [
+    {
+      "title": "US Treasury Yield Curve Forecaster",
+      "category": "Fixed income",
+      "year": "2026",
+      "description": "An interactive 24-month forecast of the 3-month, 2-year and 10-year Treasury yields. Move macro levers (UK, Japan and German yields, US unemployment, FX, credit spreads, VIX) and watch the curve, the term spreads and the implied recession probability respond.",
+      "points": [
+        "Ensemble of VARX, XGBoost and Diebold-Li, weighted by walk-forward backtest error",
+        "GARCH uncertainty bands and an Estrella-Mishkin recession probit (out-of-sample AUC 0.83)",
+        "Every model is scored against a random walk, with economic sign checks on each lever"
+      ],
+      "tags": ["Python", "VARX", "XGBoost", "Nelson-Siegel", "GARCH", "FRED"],
+      "link": "treasury/",
+      "button": "Open the forecaster"
+    },
+    {
+      "title": "Real Estate Rate-Sensitivity Map",
+      "category": "Real estate",
+      "year": "2026",
+      "description": "An interactive map of how interest rates and macro factors flow through European rate-sensitive real estate and infrastructure, from construction and financing to ownership and valuation.",
+      "points": [
+        "Each link explains the mechanism, which direction it pushes, and how to measure it",
+        "Built on ECB policy, financing costs, construction inputs and energy-efficiency data"
+      ],
+      "tags": ["D3.js", "European real estate", "Macro research"],
+      "link": "real-estate-map/",
+      "button": "Open the map"
+    }
+  ]
+}

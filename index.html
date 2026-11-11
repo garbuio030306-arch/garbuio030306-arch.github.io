@@ -56,14 +56,16 @@ ul.points { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(-
 .open span { font-family: var(--mono) }
 
 footer { padding-top: 28px; color: var(--muted); font-size: 0.85rem; display: grid; gap: 6px }
+.links { display: flex; flex-wrap: wrap; gap: 8px 20px }
+.links a { font: 500 0.9rem var(--mono) }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <span class="label">Research portfolio</span>
-    <h1>giovi365</h1>
-    <p class="lede">Fixed income and real estate research: rate forecasting, macro sensitivity, and the honest diagnostics that say how far to trust each model.</p>
+    <h1 id="name">giovi365</h1>
+    <p class="lede" id="intro"></p>
     <svg class="curve" viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true">
       <line class="ax" x1="0" y1="62" x2="600" y2="62"></line>
       <path d="M10 46 C 60 30, 110 34, 160 38 S 280 30, 340 26 S 480 16, 590 12"></path>
@@ -71,40 +73,54 @@ footer { padding-top: 28px; color: var(--muted); font-size: 0.85rem; display: gr
     </svg>
   </header>
 
-  <main class="projects">
-    <article class="project">
-      <div class="meta"><span class="n">Fixed income</span><span class="label">2026</span></div>
-      <div class="body">
-        <h2>US Treasury Yield Curve Forecaster</h2>
-        <p>An interactive 24-month forecast of the 3-month, 2-year and 10-year Treasury yields. Move macro levers (UK, Japan and German yields, US unemployment, FX, credit spreads, VIX) and watch the curve, the term spreads and the implied recession probability respond.</p>
-        <ul class="points">
-          <li>Ensemble of VARX, XGBoost and Diebold-Li, weighted by walk-forward backtest error</li>
-          <li>GARCH uncertainty bands and an Estrella-Mishkin recession probit (out-of-sample AUC 0.83)</li>
-          <li>Every model is scored against a random walk, with economic sign checks on each lever</li>
-        </ul>
-        <ul class="tags"><li>Python</li><li>VARX</li><li>XGBoost</li><li>Nelson-Siegel</li><li>GARCH</li><li>FRED</li></ul>
-        <a class="open" href="treasury/">Open the forecaster <span>→</span></a>
-      </div>
-    </article>
-
-    <article class="project">
-      <div class="meta"><span class="n">Real estate</span><span class="label">2026</span></div>
-      <div class="body">
-        <h2>Real Estate Rate-Sensitivity Map</h2>
-        <p>An interactive map of how interest rates and macro factors flow through European rate-sensitive real estate and infrastructure, from construction and financing to ownership and valuation.</p>
-        <ul class="points">
-          <li>Each link explains the mechanism, which direction it pushes, and how to measure it</li>
-          <li>Built on ECB policy, financing costs, construction inputs and energy-efficiency data</li>
-        </ul>
-        <ul class="tags"><li>D3.js</li><li>European real estate</li><li>Macro research</li></ul>
-        <a class="open" href="real-estate-map/">Open the map <span>→</span></a>
-      </div>
-    </article>
-  </main>
+  <main class="projects" id="projects"></main>
 
   <footer>
-    <p>Both projects open as interactive pages in a new tab.</p>
+    <nav class="links" id="links" aria-label="Links"></nav>
   </footer>
 </div>
+<script>
+// Everything shown here comes from projects.json - edit that file to add projects or links.
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const external = url => /^https?:/.test(url);
+
+fetch("projects.json", { cache: "no-cache" }).then(r => r.json()).then(data => {
+  document.getElementById("name").textContent = data.name;
+  document.getElementById("intro").textContent = data.intro || "";
+  document.title = data.name + " · Research Portfolio";
+
+  const list = document.getElementById("projects");
+  for (const p of data.projects || []) {
+    const art = el("article", "project");
+    const meta = el("div", "meta");
+    meta.append(el("span", "n", p.category || ""), el("span", "label", p.year || ""));
+    const body = el("div", "body");
+    body.append(el("h2", null, p.title));
+    if (p.description) body.append(el("p", null, p.description));
+    if (p.points && p.points.length) {
+      const ul = el("ul", "points"); p.points.forEach(t => ul.append(el("li", null, t))); body.append(ul);
+    }
+    if (p.tags && p.tags.length) {
+      const ul = el("ul", "tags"); p.tags.forEach(t => ul.append(el("li", null, t))); body.append(ul);
+    }
+    if (p.link) {
+      const a = el("a", "open", (p.button || "Open project") + " ");
+      a.href = p.link; a.append(el("span", null, "→"));
+      if (external(p.link)) { a.target = "_blank"; a.rel = "noopener"; }
+      body.append(a);
+    }
+    art.append(meta, body); list.append(art);
+  }
+
+  const links = document.getElementById("links");
+  for (const l of data.links || []) {
+    const a = el("a", null, l.label); a.href = l.url;
+    if (external(l.url)) { a.target = "_blank"; a.rel = "noopener"; }
+    links.append(a);
+  }
+}).catch(() => {
+  document.getElementById("projects").append(el("p", null, "Projects could not load. Check that projects.json is valid JSON."));
+});
+</script>
 </body>
 </html>
