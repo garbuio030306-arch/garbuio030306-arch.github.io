@@ -1,0 +1,131 @@
+{
+  "_comment": "Real estate vertical value chain + supporting sectors, per the GOAL spec. rateSensitivity is qualitative judgement (provenance 'added' unless noted), linkedFactors reference factors.json ids.",
+  "chains": [
+    {
+      "id": "real_estate_vertical",
+      "name": "Real Estate Vertical",
+      "provenance": "notes",
+      "source": "User-specified chain structure (GOAL spec), stage detail added/researched",
+      "currentResearchStageId": "re_ownership",
+      "stages": [
+        {
+          "id": "re_raw_materials",
+          "name": "Raw materials & commodities",
+          "examples": ["Steel", "Cement", "Timber", "Copper", "Glass"],
+          "rateSensitivity": "Medium -- prices mostly follow demand, not rates directly. But when rates slow construction, demand for these materials falls too.",
+          "mainDrivers": ["Global commodity cycles", "Construction demand", "Energy costs (smelting, kilns)", "Trade policy / tariffs"],
+          "linkedFactors": ["construction_costs", "inflation"],
+          "provenance": "added",
+          "source": "General industry knowledge",
+          "sourceDate": "2026-10-22"
+        },
+        {
+          "id": "re_building_materials",
+          "name": "Building materials & equipment",
+          "examples": ["Insulation", "HVAC", "Windows", "Elevators", "Electrical equipment"],
+          "rateSensitivity": "Medium -- demand follows construction activity, which slows when borrowing gets expensive.",
+          "mainDrivers": ["New construction volume", "Renovation/retrofit demand (EPBD-driven in Europe)", "Input commodity costs"],
+          "linkedFactors": ["construction_costs", "policy"],
+          "provenance": "added",
+          "source": "General industry knowledge",
+          "sourceDate": "2026-10-22"
+        },
+        {
+          "id": "re_engineering_architecture",
+          "name": "Engineering & architecture",
+          "examples": ["Design", "Planning", "Surveying", "Environmental consulting"],
+          "rateSensitivity": "Medium-High -- one of the first things cut when new projects stop getting approved.",
+          "mainDrivers": ["Development pipeline", "Planning/zoning regime", "Credit availability for projects"],
+          "linkedFactors": ["policy", "credit", "construction_costs"],
+          "provenance": "added",
+          "source": "General industry knowledge",
+          "sourceDate": "2026-10-22"
+        },
+        {
+          "id": "re_construction",
+          "name": "Construction",
+          "examples": ["Contractors", "Civil engineering", "Residential construction"],
+          "rateSensitivity": "High -- loan costs and demand for new space both move directly with rates.",
+          "mainDrivers": ["Construction loan rates", "Labour costs", "Materials costs", "Development spread (yield on cost vs cap rate)"],
+          "linkedFactors": ["construction_costs", "credit", "supply"],
+          "provenance": "notes",
+          "source": "research.pdf p.14-15 (development spread mechanic)"
+        },
+        {
+          "id": "re_development",
+          "name": "Property development",
+          "examples": ["Land acquisition", "Permits", "Project financing", "Development"],
+          "rateSensitivity": "Very High -- scores 9.0/10. This is the most rate-exposed step in the whole chain.",
+          "mainDrivers": ["Land cost", "Permitting speed (zoning)", "Construction financing cost", "Cap-rate vs yield-on-cost spread"],
+          "linkedFactors": ["credit", "policy", "construction_costs", "rates"],
+          "provenance": "notes",
+          "source": "research.pdf + SEED DATA /10 ranking"
+        },
+        {
+          "id": "re_ownership",
+          "name": "Real estate ownership",
+          "isCurrentResearchFocus": true,
+          "examples": ["Residential", "Offices", "Retail", "Logistics", "Data centres", "Hospitality", "Healthcare"],
+          "rateSensitivity": "High, but it depends on the segment -- Office and Residential are most exposed, Property Management the least (see the Heatmap view for detail).",
+          "mainDrivers": ["Cap rates vs risk-free rate (Rates factor)", "NAV/leverage mechanics", "Credit availability for refinancing", "Occupancy / rental growth"],
+          "linkedFactors": ["rates", "credit", "inflation", "gdp", "supply"],
+          "provenance": "notes",
+          "source": "research.pdf -- WHERE MY RESEARCH IS NOW (user-specified)"
+        },
+        {
+          "id": "re_services",
+          "name": "Property services & operations",
+          "examples": ["Brokerage", "Leasing", "Management", "Maintenance"],
+          "rateSensitivity": "Low -- scores 1.8/10, the lowest of any step. These are fee-based businesses, not asset owners, so rates affect them less directly.",
+          "mainDrivers": ["Transaction volumes", "Assets under management", "Occupancy / leasing activity"],
+          "linkedFactors": ["confidence", "credit"],
+          "provenance": "notes",
+          "source": "SEED DATA /10 ranking"
+        }
+      ],
+      "supportingSectors": [
+        {
+          "id": "sup_banking_finance",
+          "name": "Banking & Finance",
+          "examples": ["Mortgages", "Construction loans", "Corporate debt", "Refinancing"],
+          "servesStages": ["re_construction", "re_development", "re_ownership"],
+          "rateSensitivity": "Very High -- this is how rate changes actually reach the rest of the chain.",
+          "linkedFactors": ["credit", "rates"],
+          "provenance": "notes",
+          "source": "research.pdf Credit factor, p.20-22"
+        },
+        {
+          "id": "sup_insurance",
+          "name": "Insurance",
+          "examples": ["Property insurance", "Construction risk", "Liability"],
+          "servesStages": ["re_construction", "re_ownership"],
+          "rateSensitivity": "Medium -- insurers actually do better when rates are higher, but rising premiums (partly due to climate risk) squeeze property owners' profits.",
+          "linkedFactors": ["inflation", "policy"],
+          "provenance": "added",
+          "source": "General industry knowledge",
+          "sourceDate": "2026-10-22"
+        },
+        {
+          "id": "sup_utilities",
+          "name": "Utilities & infrastructure",
+          "examples": ["Electricity", "Water", "Gas", "Grid", "Comms"],
+          "servesStages": ["re_construction", "re_ownership"],
+          "rateSensitivity": "Medium -- energy prices feed straight into the cost of running a building.",
+          "linkedFactors": ["inflation"],
+          "provenance": "notes",
+          "source": "research.pdf Inflation & Energy factor"
+        },
+        {
+          "id": "sup_capital_markets",
+          "name": "Investment & capital markets",
+          "examples": ["REIT financing", "Transactions", "Asset management", "Funds"],
+          "servesStages": ["re_development", "re_ownership"],
+          "rateSensitivity": "Very High -- REIT share prices are set by comparing their dividend yield to government bond yields, so they move with rates directly (p.5).",
+          "linkedFactors": ["rates", "credit"],
+          "provenance": "notes",
+          "source": "research.pdf Rates factor, GOVERNMENT mechanic, p.5"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>giovi365 · Research Portfolio</title>
+<meta name="description" content="Fixed income and real estate research: an interactive US Treasury yield curve forecaster and a European rate-sensitivity map.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single research sheet. Name block, then two project entries set like a desk's coverage list. */
+:root {
+  --paper: #f6f7f9; --sheet: #ffffff; --ink: #18202b; --muted: #5b6573; --rule: #dde1e7;
+  --accent: #1f4e8c; --accent-soft: #e6edf7; --curve: #e05c4a;
+  --display: "Source Serif 4", Georgia, serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --paper: #10151c; --sheet: #161d26; --ink: #e5e9ef; --muted: #98a3b2; --rule: #2a3442;
+  --accent: #7fa8e0; --accent-soft: #1d2a3d; --curve: #ec8b80; color-scheme: dark } }
+* { box-sizing: border-box }
+html { -webkit-text-size-adjust: 100% }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 var(--body) }
+.wrap { max-width: 880px; margin: 0 auto; padding-block: max(48px, env(safe-area-inset-top, 0px)) 64px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)) }
+h1, h2 { font-family: var(--display); font-weight: 600; margin: 0; line-height: 1.15; text-wrap: balance }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); letter-spacing: -0.01em }
+h2 { font-size: clamp(1.35rem, 3vw, 1.7rem) }
+.label { font: 500 0.74rem var(--mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted) }
+p { margin: 0; max-width: 65ch }
+a { color: var(--accent) }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px }
+
+header { display: grid; gap: 14px; padding-bottom: 36px; border-bottom: 1px solid var(--rule) }
+header .lede { font-size: 1.1rem; color: var(--muted) }
+.curve { width: 100%; max-width: 100%; height: 70px; display: block }
+.curve path { fill: none; stroke: var(--curve); stroke-width: 2 }
+.curve .ax { stroke: var(--rule); stroke-width: 1 }
+.curve text { fill: var(--muted); font: 10px var(--mono) }
+
+.projects { display: grid }
+.project { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 8px 28px; padding-block: 34px; border-bottom: 1px solid var(--rule) }
+@media (max-width: 640px) { .project { grid-template-columns: minmax(0, 1fr) } }
+.project .meta { display: grid; gap: 4px; align-content: start }
+.project .meta .n { font: 500 0.9rem var(--mono); color: var(--accent) }
+.project .body { display: grid; gap: 14px; min-width: 0 }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; list-style: none }
+.tags li { font: 0.76rem var(--mono); padding: 3px 8px; border: 1px solid var(--rule); border-radius: 3px; color: var(--muted) }
+ul.points { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--ink); max-width: 65ch }
+.open { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 4px;
+  background: var(--accent); color: var(--sheet); text-decoration: none; font-weight: 500 }
+.open:hover { filter: brightness(1.1) }
+.open span { font-family: var(--mono) }
+
+footer { padding-top: 28px; color: var(--muted); font-size: 0.85rem; display: grid; gap: 6px }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="label">Research portfolio</span>
+    <h1>giovi365</h1>
+    <p class="lede">Fixed income and real estate research: rate forecasting, macro sensitivity, and the honest diagnostics that say how far to trust each model.</p>
+    <svg class="curve" viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true">
+      <line class="ax" x1="0" y1="62" x2="600" y2="62"></line>
+      <path d="M10 46 C 60 30, 110 34, 160 38 S 280 30, 340 26 S 480 16, 590 12"></path>
+      <text x="10" y="58">3m</text><text x="150" y="58">2y</text><text x="570" y="58">10y</text>
+    </svg>
+  </header>
+
+  <main class="projects">
+    <article class="project">
+      <div class="meta"><span class="n">Fixed income</span><span class="label">2026</span></div>
+      <div class="body">
+        <h2>US Treasury Yield Curve Forecaster</h2>
+        <p>An interactive 24-month forecast of the 3-month, 2-year and 10-year Treasury yields. Move macro levers (UK, Japan and German yields, US unemployment, FX, credit spreads, VIX) and watch the curve, the term spreads and the implied recession probability respond.</p>
+        <ul class="points">
+          <li>Ensemble of VARX, XGBoost and Diebold-Li, weighted by walk-forward backtest error</li>
+          <li>GARCH uncertainty bands and an Estrella-Mishkin recession probit (out-of-sample AUC 0.83)</li>
+          <li>Every model is scored against a random walk, with economic sign checks on each lever</li>
+        </ul>
+        <ul class="tags"><li>Python</li><li>VARX</li><li>XGBoost</li><li>Nelson-Siegel</li><li>GARCH</li><li>FRED</li></ul>
+        <a class="open" href="treasury/">Open the forecaster <span>→</span></a>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="meta"><span class="n">Real estate</span><span class="label">2026</span></div>
+      <div class="body">
+        <h2>Real Estate Rate-Sensitivity Map</h2>
+        <p>An interactive map of how interest rates and macro factors flow through European rate-sensitive real estate and infrastructure, from construction and financing to ownership and valuation.</p>
+        <ul class="points">
+          <li>Each link explains the mechanism, which direction it pushes, and how to measure it</li>
+          <li>Built on ECB policy, financing costs, construction inputs and energy-efficiency data</li>
+        </ul>
+        <ul class="tags"><li>D3.js</li><li>European real estate</li><li>Macro research</li></ul>
+        <a class="open" href="real-estate-map/">Open the map <span>→</span></a>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <p>Both projects open as interactive pages in a new tab.</p>
+  </footer>
+</div>
+</body>
+</html>

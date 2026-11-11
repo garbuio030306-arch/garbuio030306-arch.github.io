@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>US Treasury Yield Forecaster</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a bond-desk terminal sheet. Lever panel on the left, charts on the right, trust tables below. */
+:root {
+  --paper: #f6f7f9; --sheet: #ffffff; --ink: #18202b; --muted: #5b6573; --rule: #dde1e7;
+  --accent: #1f4e8c; --accent-soft: #e6edf7; --warn: #9a5b00; --warn-soft: #fbf1e1;
+  --bad: #a3322a; --bad-soft: #f8e6e4; --good: #2d7a4f;
+  --grid: rgba(24,32,43,0.08); --vline: rgba(24,32,43,0.45);
+  --display: "Source Serif 4", Georgia, serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #10151c; --sheet: #161d26; --ink: #e5e9ef; --muted: #98a3b2; --rule: #2a3442;
+  --accent: #7fa8e0; --accent-soft: #1d2a3d; --warn: #e3a64a; --warn-soft: #2e2416;
+  --bad: #ec8b80; --bad-soft: #33201e; --good: #6cc394;
+  --grid: rgba(229,233,239,0.09); --vline: rgba(229,233,239,0.5); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #10151c; --sheet: #161d26; --ink: #e5e9ef; --muted: #98a3b2; --rule: #2a3442;
+  --accent: #7fa8e0; --accent-soft: #1d2a3d; --warn: #e3a64a; --warn-soft: #2e2416;
+  --bad: #ec8b80; --bad-soft: #33201e; --good: #6cc394;
+  --grid: rgba(229,233,239,0.09); --vline: rgba(229,233,239,0.5); color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1320px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; line-height: 1.2 }
+h1 { font-size: clamp(1.6rem, 3.2vw, 2.3rem) }
+h2 { font-size: 1.35rem }
+h3 { font-size: 1.02rem; font-family: var(--body) }
+.eyebrow { font: 500 0.72rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted) }
+.cap { color: var(--muted); font-size: 0.86rem; max-width: 78ch; margin: 0 }
+.cap b, .cap strong { color: var(--ink); font-weight: 600 }
+a { color: var(--accent) }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums }
+
+header { display: grid; gap: 10px; margin-bottom: 22px }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border: 1px solid var(--rule);
+  background: var(--sheet); margin-bottom: 14px }
+.metric { padding: 12px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); min-width: 0 }
+.metric .k { font-size: 0.76rem; color: var(--muted) }
+.metric .v { font: 500 1.45rem var(--mono); font-variant-numeric: tabular-nums; margin-top: 2px }
+.metric .d { font: 0.78rem var(--mono); color: var(--muted) }
+.metric .d.up { color: var(--bad) } .metric .d.down { color: var(--good) }
+.metric.lever { background: var(--accent-soft) }
+
+.effect { background: var(--accent-soft); border-left: 3px solid var(--accent); padding: 10px 14px; margin-bottom: 14px; font-size: 0.92rem }
+
+.layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr) } }
+aside { background: var(--sheet); border: 1px solid var(--rule); padding: 16px; display: grid; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto }
+@media (max-width: 900px) { aside { position: static; max-height: none } }
+aside h2 { font-size: 1.05rem }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 4px }
+legend { font-weight: 600; font-size: 0.86rem; margin-bottom: 4px; padding: 0 }
+label.opt { display: flex; gap: 8px; align-items: center; font-size: 0.88rem; cursor: pointer; padding: 2px 0 }
+input[type=radio], input[type=checkbox] { accent-color: var(--accent) }
+input[type=range] { width: 100%; accent-color: var(--accent) }
+select, button { font: inherit; font-size: 0.88rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 6px 8px; border-radius: 4px }
+button { cursor: pointer } button:hover { border-color: var(--accent) }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.group { border-top: 1px solid var(--rule); padding-top: 12px; display: grid; gap: 10px }
+.group > .gname { font-weight: 600; font-size: 0.9rem }
+.slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.82rem }
+.slider .val { font-family: var(--mono); color: var(--accent) }
+.flag { font-size: 0.8rem; padding: 8px 10px; border-radius: 4px; background: var(--warn-soft); color: var(--warn) }
+.flag.sign { background: var(--bad-soft); color: var(--bad) }
+.extrap { font-size: 0.78rem; color: var(--warn) }
+.hint { font-size: 0.78rem; color: var(--muted); margin: 0 }
+
+.panel { background: var(--sheet); border: 1px solid var(--rule); padding: 16px; display: grid; gap: 10px; min-width: 0 }
+.charts { display: grid; gap: 22px; min-width: 0 }
+.chart { width: 100%; min-height: 300px }
+#main-chart { height: 980px } #paths-chart { height: 520px }
+@media (max-width: 600px) { #main-chart { height: 1100px } #paths-chart { height: 600px } }
+
+.trust { display: grid; gap: 22px; margin-top: 30px }
+.two { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 22px }
+@media (max-width: 900px) { .two { grid-template-columns: minmax(0, 1fr) } }
+.tbl { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 0.8rem }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap }
+th { font-weight: 600; color: var(--muted); font-size: 0.74rem; background: var(--paper) }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums }
+td.t, th.t { text-align: left; font-family: var(--body) }
+td.wrap { white-space: normal; min-width: 200px; text-align: left; font-family: var(--body) }
+td.win { color: var(--good); font-weight: 500 }
+.kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
+.kv div { border: 1px solid var(--rule); padding: 10px 12px }
+ul.notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.88rem; max-width: 90ch }
+footer { margin-top: 30px; border-top: 1px solid var(--rule); padding-top: 14px }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">2-year lever-driven forecast · VARX / XGBoost / Diebold-Li ensemble</span>
+    <h1>US Treasury yield curve</h1>
+    <p class="cap" id="dates"></p>
+  </header>
+
+  <div class="metrics" id="metrics"></div>
+  <div class="effect" id="effect" hidden></div>
+
+  <div class="layout">
+    <aside aria-label="Levers">
+      <div style="display:grid;gap:6px">
+        <h2>Chart settings</h2>
+        <label for="ci" class="hint">Uncertainty band (GARCH)</label>
+        <select id="ci">
+          <option value="1">68% (narrow)</option><option value="1.282">80%</option>
+          <option value="1.645">90%</option><option value="1.96">95% (wide)</option>
+        </select>
+      </div>
+      <div style="display:grid;gap:8px">
+        <h2>Levers</h2>
+        <label class="opt"><input type="checkbox" id="advanced"> Combine multiple levers</label>
+        <p class="hint" id="mode-hint"></p>
+        <fieldset id="lever-list"><legend>Active lever</legend></fieldset>
+        <button id="reset" type="button">Reset to baseline</button>
+      </div>
+      <div id="controls" style="display:grid;gap:14px"></div>
+    </aside>
+
+    <div class="charts">
+      <section class="panel">
+        <div id="main-chart" class="chart" role="img" aria-label="Yields, term spreads and recession probability: history and 24-month forecast"></div>
+        <p class="cap">The top chart shows one blended forecast line per maturity. VARX, XGBoost, Diebold-Li and the random walk are combined with weights set by how accurate each has been in the backtest. The thin dotted lines are the <b>model range</b>: the lowest and highest of the four raw model paths at each month. A wide gap means the models disagree. The 3m yield has no ensemble because the backtest never scored it, so it shows the VARX baseline. See <a href="#individual-model-paths">individual model paths</a> for each model on its own.</p>
+        <p class="cap" id="rec-cap"></p>
+      </section>
+
+      <section class="panel" id="individual-model-paths">
+        <h2>Individual model paths: VARX, XGBoost, Diebold-Li</h2>
+        <div id="paths-chart" class="chart" role="img" aria-label="Each model's 24-month forecast path"></div>
+        <p class="cap">Solid = history, dashed = VARX baseline, dotted = XGBoost, dash-dot = Diebold-Li, long-dash grey = random walk, thick solid = active lever scenario. Purple = 3m, blue = 2y, red = 10y. Only VARX responds to levers. XGBoost is shown at baseline, and Diebold-Li ignores levers by design, which is also why the ensemble is baseline-only.</p>
+      </section>
+    </div>
+  </div>
+
+  <div class="trust">
+    <h2>How much should you trust this?</h2>
+    <div class="two">
+      <section class="panel">
+        <h3>Walk-forward backtest: RMSE vs a random walk</h3>
+        <p class="hint">A ratio below 1 means the model beats the naive "no change" forecast. Green marks a win.</p>
+        <div class="tbl" id="bt"></div>
+        <p class="cap" id="bt-cap"></p>
+      </section>
+      <section class="panel">
+        <h3>Recession model</h3>
+        <div class="kv" id="rec-kv"></div>
+        <p class="cap">Estimated 1959–2026 on 10 recessions (the 2016+ lever window contains only COVID). Correlation with the NY Fed's published series: <b>0.997</b>.</p>
+        <h3>Sealed 9-month holdout (RMSE)</h3>
+        <div class="tbl" id="holdout"></div>
+      </section>
+    </div>
+    <section class="panel">
+      <h3>Ensemble weights</h3>
+      <p class="cap">Inverse-MSE weights (Bates &amp; Granger 1969): each model's share is proportional to 1/RMSE² from the backtest, reweighted at every month of the path.</p>
+      <div class="tbl" id="weights"></div>
+    </section>
+    <section class="panel">
+      <h3>Lever diagnostics: fitted effects and economic sign checks</h3>
+      <div class="tbl" id="resp"></div>
+      <ul class="notes" id="resp-notes"></ul>
+    </section>
+  </div>
+
+  <footer><p class="cap" id="foot"></p></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"></script>
+<script>// Port of model.py's lever machinery (LeverPath, forecast_varx, apply_addon_lever,
+// recession_prob). Everything is linear in the exogenous paths, so this reproduces
+// the Streamlit app's lever scenarios exactly from the exported coefficients.
+(function (root) {
+  const H = 24;
+
+  function leverLevels(lv, col, last) {
+    const tgt = col in lv.targets ? lv.targets[col] : last;
+    const out = [];
+    for (let h = 1; h <= H; h++) {
+      if (lv.kind === "flat") out.push(tgt);
+      else if (lv.kind === "step") out.push(h >= Math.max(1, lv.start) ? tgt : last);
+      else {
+        const end = Math.max(1, Math.min(lv.end, H));
+        out.push(last + Math.min(Math.max(h / end, 0), 1) * (tgt - last));
+      }
+    }
+    return out;
+  }
+
+  function groupOf(D, col) {
+    for (const g in D.leverGroups) if (D.leverGroups[g].includes(col)) return g;
+    return null;
+  }
+
+  function reparam(D, vals) {
+    const out = Object.assign({}, vals);
+    for (const g in D.varx.levelSlope) {
+      const [c2, c10] = D.varx.levelSlope[g];
+      if (c2 in out && c10 in out) {
+        const v2 = out[c2], v10 = out[c10];
+        delete out[c2]; delete out[c10];
+        out[g + "_level"] = (v2 + v10) / 2;
+        out[g + "_slope"] = v10 - v2;
+      }
+    }
+    return out;
+  }
+
+  function forecastVarx(D, levers) {
+    const V = D.varx;
+    const paths = {};
+    for (const c of V.rawExog) {
+      const g = groupOf(D, c);
+      paths[c] = levers && levers[g] ? leverLevels(levers[g], c, D.leverNow[c]) : V.baseExog[c];
+    }
+    const level = Object.assign({}, D.lastLevel);
+    let lag = Object.assign({}, V.lastLag);
+    const out = {};
+    V.endog.forEach(e => (out[e] = []));
+    for (let h = 1; h <= H; h++) {
+      const ex = {};
+      for (const c of V.rawExog) {
+        const cur = paths[c][h - 1];
+        if (V.levelExog.includes(c)) ex[c] = cur;
+        else ex[c] = cur - (h >= 2 ? paths[c][h - 2] : D.leverNow[c]);
+      }
+      const ev = reparam(D, ex);
+      const d = {};
+      for (const t in V.coefs) {
+        const b = V.coefs[t];
+        let x = b.const || 0;
+        for (const e of V.endog) x += (b["L1_d_" + e] || 0) * (lag[e] || 0);
+        for (const c in ev) x += (b[c] || 0) * ev[c];
+        d[t] = x;
+      }
+      for (const e of V.endog) { level[e] += d[e]; out[e].push(level[e]); }
+      lag = d;
+    }
+    return out;
+  }
+
+  function applyAddon(D, path, name, lv) {
+    const A = D.addons[name];
+    const p = {};
+    for (const c of A.cols) p[c] = leverLevels(lv, c, D.leverNow[c]);
+    const out = {};
+    for (const e in path) {
+      let cum = 0;
+      out[e] = path[e].map((v, i) => {
+        const h = i + 1;
+        let step = 0;
+        for (const c of A.cols) {
+          const prev = h >= 2 ? p[c][h - 2] : D.leverNow[c];
+          step += A.betas[e][c] * (p[c][h - 1] - prev);
+        }
+        cum += step;
+        return v + cum;
+      });
+    }
+    return out;
+  }
+
+  // Abramowitz-Stegun 7.1.26 erf, |error| < 1.5e-7 - plenty for a probability display.
+  function normCdf(x) {
+    const z = Math.abs(x) / Math.SQRT2, t = 1 / (1 + 0.3275911 * z);
+    const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z);
+    return x >= 0 ? 0.5 * (1 + y) : 0.5 * (1 - y);
+  }
+
+  function recessionProb(D, spread, which) {
+    const c = which === "10y3m" ? D.recession.spread_10y3m_full : D.recession.spread_10y2y_common;
+    return normCdf(c.const + c.slope * spread);
+  }
+
+  function compute(D, levers) {
+    const other = Object.assign({}, levers || {});
+    const credit = other.credit, germany = other.germany;
+    delete other.credit; delete other.germany;
+    let path = forecastVarx(D, Object.keys(other).length ? other : null);
+    if (credit) path = applyAddon(D, path, "credit", credit);
+    if (germany) path = applyAddon(D, path, "germany", germany);
+    path.term_spread_us = path.yield_10y.map((v, i) => v - path.yield_2y[i]);
+    path.term_spread_us_3m = path.yield_10y.map((v, i) => v - path.yield_3m[i]);
+    path.p_rec_10y3m = path.term_spread_us_3m.map(s => recessionProb(D, s, "10y3m"));
+    path.p_rec_10y2y = path.term_spread_us.map(s => recessionProb(D, s, "10y2y"));
+    return path;
+  }
+
+  root.YieldEngine = { compute, recessionProb, H };
+  if (typeof module !== "undefined") module.exports = root.YieldEngine;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+const D = {"anchor": "2026-07-31", "panelStart": "2016-10-31", "future": ["2026-08-31", "2026-09-30", "2026-10-31", "2026-11-30", "2026-12-31", "2027-01-31", "2027-02-28", "2027-03-31", "2027-04-30", "2027-05-31", "2027-06-30", "2027-07-31", "2027-08-31", "2027-09-30", "2027-10-31", "2027-11-30", "2027-12-31", "2028-01-31", "2028-02-29", "2028-03-31", "2028-04-30", "2028-05-31", "2028-06-30", "2028-07-31"], "live": {"y2": {"value": 4.61, "date": "2026-11-03"}, "y10": {"value": 4.95, "date": "2026-11-03"}, "y3m": {"value": 4.21, "date": "2026-11-03"}}, "hist": {"dates": ["2022-07-31", "2022-08-31", "2022-09-30", "2022-10-31", "2022-11-30", "2022-12-31", "2023-01-31", "2023-02-28", "2023-03-31", "2023-04-30", "2023-05-31", "2023-06-30", "2023-07-31", "2023-08-31", "2023-09-30", "2023-10-31", "2023-11-30", "2023-12-31", "2024-01-31", "2024-02-29", "2024-03-31", "2024-04-30", "2024-05-31", "2024-06-30", "2024-07-31", "2024-08-31", "2024-09-30", "2024-10-31", "2024-11-30", "2024-12-31", "2025-01-31", "2025-02-28", "2025-03-31", "2025-04-30", "2025-05-31", "2025-06-30", "2025-07-31", "2025-08-31", "2025-09-30", "2025-10-31", "2025-11-30", "2025-12-31", "2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30", "2026-05-31", "2026-06-30", "2026-07-31"], "yield_3m": [2.41, 2.96, 3.33, 4.22, 4.37, 4.42, 4.7, 4.88, 4.85, 5.1, 5.52, 5.43, 5.55, 5.56, 5.55, 5.59, 5.45, 5.4, 5.42, 5.45, 5.46, 5.46, 5.46, 5.48, 5.41, 5.21, 4.73, 4.64, 4.58, 4.37, 4.31, 4.32, 4.32, 4.31, 4.36, 4.41, 4.41, 4.23, 4.02, 3.89, 3.88, 3.67, 3.67, 3.67, 3.7, 3.68, 3.69, 3.87, 3.83], "yield_2y": [2.89, 3.45, 4.22, 4.51, 4.38, 4.41, 4.21, 4.81, 4.06, 4.04, 4.4, 4.87, 4.88, 4.85, 5.03, 5.07, 4.73, 4.23, 4.27, 4.64, 4.59, 5.04, 4.89, 4.71, 4.29, 3.91, 3.66, 4.16, 4.13, 4.25, 4.22, 3.99, 3.89, 3.6, 3.89, 3.72, 3.94, 3.59, 3.6, 3.6, 3.47, 3.47, 3.52, 3.38, 3.79, 3.88, 3.98, 4.14, 4.28], "yield_10y": [2.67, 3.15, 3.83, 4.1, 3.68, 3.88, 3.52, 3.92, 3.48, 3.44, 3.64, 3.81, 3.97, 4.09, 4.59, 4.88, 4.37, 3.88, 3.99, 4.25, 4.2, 4.69, 4.51, 4.36, 4.09, 3.91, 3.81, 4.28, 4.18, 4.58, 4.58, 4.24, 4.23, 4.17, 4.41, 4.24, 4.37, 4.23, 4.16, 4.11, 4.02, 4.18, 4.26, 3.97, 4.3, 4.4, 4.45, 4.44, 4.75]}, "base": {"varx": {"yield_3m": [3.865694, 3.894518, 3.922168, 3.949581, 3.976888, 4.004131, 4.03133, 4.058499, 4.085648, 4.112782, 4.139907, 4.167025, 4.194138, 4.221248, 4.248356, 4.275463, 4.302569, 4.329673, 4.356778, 4.383882, 4.410986, 4.438089, 4.465193, 4.492296], "yield_2y": [4.297752, 4.307986, 4.316499, 4.324485, 4.332191, 4.339712, 4.347109, 4.354419, 4.36167, 4.368881, 4.376064, 4.383228, 4.390378, 4.397519, 4.404655, 4.411785, 4.418913, 4.426039, 4.433163, 4.440287, 4.44741, 4.454532, 4.461654, 4.468776], "yield_10y": [4.761486, 4.752037, 4.740873, 4.728945, 4.716582, 4.70393, 4.691081, 4.678097, 4.665019, 4.651877, 4.638692, 4.625476, 4.612239, 4.598988, 4.585727, 4.57246, 4.559187, 4.545912, 4.532634, 4.519355, 4.506075, 4.492794, 4.479512, 4.46623]}, "xgb": {"yield_3m": [3.906881, 3.904785, 3.921694, 3.918939, 3.912198, 3.90866, 3.913626, 3.908315, 3.90982, 3.911269, 3.913265, 3.914798, 3.915998, 3.917077, 3.918386, 3.919075, 3.920135, 3.92109, 3.921949, 3.922722, 3.923418, 3.924044, 3.924608, 3.925115], "yield_2y": [4.296419, 4.30264, 4.315731, 4.308698, 4.299339, 4.295502, 4.288675, 4.277675, 4.274395, 4.283792, 4.280507, 4.277551, 4.276637, 4.275814, 4.27335, 4.271205, 4.26946, 4.267664, 4.26625, 4.264795, 4.263485, 4.262307, 4.261246, 4.260292], "yield_10y": [4.715709, 4.65616, 4.633914, 4.604875, 4.569263, 4.536858, 4.52422, 4.496186, 4.471517, 4.460554, 4.440097, 4.422921, 4.407463, 4.39355, 4.381029, 4.36976, 4.359617, 4.350489, 4.342274, 4.33488, 4.328226, 4.322237, 4.316847, 4.311996]}, "dns": {"yield_3m": [3.915381, 3.946153, 3.976337, 4.005929, 4.034924, 4.063323, 4.091126, 4.118337, 4.14496, 4.171001, 4.196468, 4.221367, 4.245707, 4.269497, 4.292748, 4.315468, 4.337668, 4.35936, 4.380553, 4.401258, 4.421487, 4.44125, 4.460558, 4.479422], "yield_2y": [4.152751, 4.165422, 4.178841, 4.192876, 4.207411, 4.222343, 4.237584, 4.253055, 4.268687, 4.284422, 4.300206, 4.315994, 4.331748, 4.347434, 4.363023, 4.37849, 4.393815, 4.408978, 4.423966, 4.438765, 4.453367, 4.467762, 4.481944, 4.495908], "yield_10y": [4.856798, 4.859703, 4.863455, 4.86794, 4.87306, 4.878726, 4.88486, 4.891392, 4.89826, 4.905412, 4.912799, 4.920379, 4.928115, 4.935975, 4.943929, 4.951953, 4.960025, 4.968124, 4.976235, 4.984342, 4.992433, 5.000497, 5.008524, 5.016506]}}, "ensemble": {"yield_2y": [4.264245, 4.269172, 4.27679, 4.278974, 4.280692, 4.284244, 4.287108, 4.28886, 4.293061, 4.301182, 4.305549, 4.31007, 4.315193, 4.320377, 4.325087, 4.329904, 4.334842, 4.339758, 4.344774, 4.349757, 4.354757, 4.359766, 4.364775, 4.369778], "yield_10y": [4.773322, 4.759992, 4.754994, 4.748309, 4.740174, 4.732934, 4.726095, 4.715667, 4.706061, 4.699996, 4.691535, 4.683951, 4.678526, 4.673567, 4.669034, 4.664887, 4.661094, 4.65762, 4.654437, 4.651516, 4.648832, 4.646363, 4.644088, 4.641987]}, "ensWeights": {"yield_2y": {"1": {"varx": 0.2606759473325572, "xgb": 0.27448784111474717, "dns": 0.1955976386666583, "rw": 0.26923857288603725}, "6": {"varx": 0.22020476294847036, "xgb": 0.30191249762463085, "dns": 0.23562094629410393, "rw": 0.2422617931327948}, "12": {"varx": 0.21060615528979146, "xgb": 0.30170376820897216, "dns": 0.25193697218889016, "rw": 0.23575310431234622}, "24": {"varx": 0.19540094978812328, "xgb": 0.3017792130709062, "dns": 0.27251753348746116, "rw": 0.23030230365350934}}, "yield_10y": {"1": {"varx": 0.23724604762222443, "xgb": 0.2416117643394716, "dns": 0.2704328388155654, "rw": 0.2507093492227387}, "6": {"varx": 0.20258128794040012, "xgb": 0.23275331207657854, "dns": 0.3253155938909984, "rw": 0.23934980609202303}, "12": {"varx": 0.203454863131924, "xgb": 0.26873258063622757, "dns": 0.2769249639656666, "rw": 0.2508875922661818}, "24": {"varx": 0.1854941382025895, "xgb": 0.2965846169341084, "dns": 0.27965500518365766, "rw": 0.23826623967964447}}}, "lastLevel": {"yield_3m": 3.83, "yield_2y": 4.28, "yield_10y": 4.75}, "sigma": {"yield_3m": [0.117299, 0.171545, 0.216809, 0.257865, 0.296467, 0.333467, 0.369348, 0.404407, 0.438842, 0.472789, 0.506346, 0.539586, 0.572563, 0.605322, 0.637896, 0.670311, 0.702589, 0.73475, 0.766806, 0.798772, 0.830657, 0.86247, 0.89422, 0.925912], "yield_2y": [0.2549, 0.363975, 0.450013, 0.524477, 0.591752, 0.65406, 0.712705, 0.768527, 0.8221, 0.873838, 0.92405, 0.972971, 1.020788, 1.067648, 1.113673, 1.158962, 1.203598, 1.247652, 1.291182, 1.33424, 1.37687, 1.419112, 1.460998, 1.502558], "yield_10y": [0.251068, 0.355294, 0.435426, 0.503112, 0.56286, 0.61698, 0.666843, 0.713344, 0.757102, 0.798567, 0.838081, 0.875908, 0.912256, 0.947297, 0.981171, 1.013994, 1.045866, 1.076871, 1.107082, 1.136561, 1.165366, 1.193544, 1.221138, 1.248189]}, "varx": {"endog": ["yield_3m", "yield_2y", "yield_10y"], "coefs": {"yield_3m": {"const": 0.03167880397293823, "L1_d_yield_3m": 0.05016110569021412, "L1_d_yield_2y": 0.03159053362809583, "L1_d_yield_10y": 0.022185415594943175, "UK_2y": 0.008920909943979845, "UK_10y": 0.009374345136704586, "unemployment": 0.0003172793861155999, "DEXJPUS": 0.0011538314999110508, "DEXUSUK": -0.04757390802687469, "DEXUSEU": -0.14658136402833036, "DEXCHUS": 0.04322406776380218, "vix": -0.00031342207559845273, "japan_level": -0.04200539414363112, "japan_slope": 0.013128653253124546}, "yield_2y": {"const": 0.027183145958474094, "L1_d_yield_3m": 0.06761875170583356, "L1_d_yield_2y": 0.0517223011256702, "L1_d_yield_10y": 0.01884443581682423, "UK_2y": 0.12484352190223934, "UK_10y": 0.13149421352099294, "unemployment": -0.002748749442080093, "DEXJPUS": 0.012178145962036792, "DEXUSUK": -0.3105276980846038, "DEXUSEU": -0.7596208606912306, "DEXCHUS": 0.08821683804226617, "vix": -0.0011762708522897003, "japan_level": 0.1834596660024324, "japan_slope": 0.2536935926060558}, "yield_10y": {"const": 0.021707270316475166, "L1_d_yield_3m": -0.022410362361249936, "L1_d_yield_2y": 0.15636106014554454, "L1_d_yield_10y": -0.0033079562786093447, "UK_2y": -0.1809643999813785, "UK_10y": 0.683639648278583, "unemployment": 0.0033567301063567394, "DEXJPUS": 0.024894301395221363, "DEXUSUK": 0.4147799706653522, "DEXUSEU": -0.971995459201812, "DEXCHUS": -0.1571440270680899, "vix": -0.0018991251602217397, "japan_level": 0.11488213392965836, "japan_slope": 0.45986927519319215}}, "rawExog": ["UK_2y", "UK_10y", "JP_2y", "JP_10y", "unemployment", "DEXJPUS", "DEXUSUK", "DEXUSEU", "DEXCHUS", "vix"], "lastLag": {"yield_3m": -0.040000000000000036, "yield_2y": 0.14000000000000057, "yield_10y": 0.3099999999999996}, "baseExog": {"UK_2y": [4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102, 4.299102], "UK_10y": [5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995, 5.103995], "JP_2y": [1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507, 1.507], "JP_10y": [2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801, 2.801], "unemployment": [4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2], "DEXJPUS": [159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16, 159.16], "DEXUSUK": [1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347, 1.347], "DEXUSEU": [1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519, 1.1519], "DEXCHUS": [6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509, 6.7509], "vix": [16.840733, 17.425755, 17.828057, 18.104707, 18.29495, 18.425774, 18.515738, 18.577603, 18.620146, 18.649401, 18.669519, 18.683354, 18.692867, 18.69941, 18.703908, 18.707002, 18.70913, 18.710592, 18.711599, 18.71229, 18.712766, 18.713093, 18.713318, 18.713473]}, "levelExog": ["vix"], "levelSlope": {"japan": ["JP_2y", "JP_10y"]}, "nobs": 116}, "addons": {"credit": {"betas": {"yield_3m": {"const": -0.046077528002839235, "IG_OAS": 0.34785885034570635, "HY_OAS": -0.03229278574802808}, "yield_2y": {"const": -0.024712298770823364, "IG_OAS": -1.4693270519941, "HY_OAS": 0.3368801753786448}, "yield_10y": {"const": 0.015772109348570068, "IG_OAS": -1.3995025495394728, "HY_OAS": 0.49380992350192604}}, "cols": ["IG_OAS", "HY_OAS"], "nobs": 35}, "germany": {"betas": {"yield_3m": {"const": 0.02256863563284301, "DE_2y": 0.5336793007830395, "DE_10y": -0.31159194762894}, "yield_2y": {"const": 0.0035922102312863726, "DE_2y": 0.7201259063812161, "DE_10y": 0.18132616243739286}, "yield_10y": {"const": 0.0019367689563213515, "DE_2y": -0.1093281100075003, "DE_10y": 0.9915650405960489}}, "cols": ["DE_2y", "DE_10y"], "nobs": 117}}, "recession": {"spread_10y3m_common": {"const": -0.8707410895611751, "slope": -0.4915072214504787}, "spread_10y2y_common": {"const": -0.9277648107420586, "slope": -0.7560599998857443}, "spread_10y3m_full": {"const": -0.7673839007494326, "slope": -0.5535088258272968, "insample_brier": 0.08875699367220193, "oos_brier": 0.08146470239926802, "oos_auc": 0.8250423968343698}, "metrics": {"common_sample": {"spread_10y3m": {"insample_brier": 0.07627160154865642, "oos_brier": 0.07510356928006058, "oos_auc": 0.7350114043662431}, "spread_10y2y": {"insample_brier": 0.0762704580685901, "oos_brier": 0.06904301529142354, "oos_auc": 0.6770527859237536}}, "benchmark_brier": 0.0886411950588911, "winner": "spread_10y2y"}}, "leverGroups": {"uk": ["UK_2y", "UK_10y"], "japan": ["JP_2y", "JP_10y"], "germany": ["DE_2y", "DE_10y"], "unemployment": ["unemployment"], "fx": ["DEXJPUS", "DEXUSUK", "DEXUSEU", "DEXCHUS"], "credit": ["IG_OAS", "HY_OAS"], "vix": ["vix"]}, "leverNow": {"UK_2y": 4.299102499557623, "UK_10y": 5.1039949579875055, "JP_2y": 1.507, "JP_10y": 2.801, "DE_2y": 2.76, "DE_10y": 3.21, "unemployment": 4.2, "DEXJPUS": 159.16, "DEXUSUK": 1.347, "DEXUSEU": 1.1519, "DEXCHUS": 6.7509, "IG_OAS": 0.79, "HY_OAS": 2.85, "vix": 15.99}, "leverRange": {"UK_2y": [-0.1352522340608348, 5.262085797703536], "UK_10y": [0.1252193538685038, 5.1039949579875055], "JP_2y": [-0.323, 1.507], "JP_10y": [-0.275, 2.801], "DE_2y": [-0.92, 3.19], "DE_10y": [-0.71, 3.21], "unemployment": [3.4, 14.8], "DEXJPUS": [103.19, 162.61], "DEXUSUK": [1.1134, 1.419], "DEXUSEU": [0.9783, 1.2428], "DEXCHUS": [6.2726, 7.3166], "IG_OAS": [0.73, 1.32], "HY_OAS": [2.68, 4.42], "vix": [9.51, 53.54]}, "flags": [{"lever": "japan", "flag": "magnitude", "detail": "partial (10y up but 2y up more) [not significant]", "max_abs_t": 0.4061055601470678}, {"lever": "germany", "flag": "magnitude", "detail": "partial (10y up but 2y up more)", "max_abs_t": null}, {"lever": "unemployment", "flag": "magnitude", "detail": "partial (2y falls but not more than 10y) [not significant]", "max_abs_t": 0.4748768000768362}, {"lever": "vix", "flag": "insignificant", "detail": "flight-to-quality regime (yields down) [not significant]", "max_abs_t": 1.5557881756659275}], "responses": [{"lever": "uk", "shock": "UK 2y & 10y +100bp", "d_2y": 0.2840909511422707, "d_10y": 0.5443669247725085, "d_spread": 0.2602759736302378, "max_abs_t": 8.553419171379042, "significant": true, "prior": "10y up, and more than 2y", "verdict": "ok", "flag": null}, {"lever": "japan", "shock": "Japan 2y & 10y +100bp", "d_2y": 0.1939061380642535, "d_10y": 0.1454906138660012, "d_spread": -0.0484155241982522, "max_abs_t": 0.4061055601470678, "significant": false, "prior": "10y up, and more than 2y", "verdict": "partial (10y up but 2y up more) [not significant]", "flag": "magnitude"}, {"lever": "germany", "shock": "Germany 2y & 10y +100bp", "d_2y": 0.9014520688186084, "d_10y": 0.8822369305885482, "d_spread": -0.0192151382300602, "max_abs_t": null, "significant": null, "prior": "10y up, and more than 2y", "verdict": "partial (10y up but 2y up more)", "flag": "magnitude"}, {"lever": "unemployment", "shock": "US unemployment +1pp", "d_2y": -0.0028190948001212, "d_10y": 0.0028994398999042, "d_spread": 0.0057185347000254, "max_abs_t": 0.4748768000768362, "significant": false, "prior": "2y down, and more than 10y", "verdict": "partial (2y falls but not more than 10y) [not significant]", "flag": "magnitude"}, {"lever": "fx", "shock": "USD +10% broad", "d_2y": 0.4186862369961037, "d_10y": 0.4081437056687642, "d_spread": -0.0105425313273395, "max_abs_t": 5.718939388343343, "significant": true, "prior": "ambiguous (no strong prior)", "verdict": "inflation/supply regime (yields up)", "flag": null}, {"lever": "credit", "shock": "IG +50bp / HY +200bp", "d_2y": -0.0609031752397601, "d_10y": 0.2878685722341156, "d_spread": 0.3487717474738758, "max_abs_t": null, "significant": null, "prior": "ambiguous: down = flight-to-quality, up = inflation/supply risk-off", "verdict": "inflation/supply regime (yields up)", "flag": null}, {"lever": "vix", "shock": "VIX +10 points", "d_2y": -0.2358498333824856, "d_10y": -0.3756013450649575, "d_spread": -0.1397515116824719, "max_abs_t": 1.5557881756659275, "significant": false, "prior": "ambiguous: down = flight-to-quality, up = inflation/supply risk-off", "verdict": "flight-to-quality regime (yields down) [not significant]", "flag": "insignificant"}], "backtest": [{"target": "yield_10y", "h": 1, "varx_rmse": 0.2873360066261746, "varx_mae": 0.2330779960968013, "varx_dir": 0.4745762711864407, "xgb_rmse": 0.2847282155716226, "xgb_mae": 0.2260147136738524, "xgb_dir": 0.5423728813559322, "dns_rmse": 0.2691285869553145, "dns_mae": 0.2155740032916516, "dns_dir": 0.5084745762711864, "ensemble_rmse": 0.275546393985472, "ensemble_mae": 0.222133361713463, "ensemble_dir": 0.6101694915254238, "rw_rmse": 0.2795144599718113, "rw_mae": 0.2251666666666666, "n": 60.0}, {"target": "yield_10y", "h": 6, "varx_rmse": 0.7216237148639023, "varx_mae": 0.5500626151937984, "varx_dir": 0.3636363636363636, "xgb_rmse": 0.6732285516983689, "xgb_mae": 0.5255460400147667, "xgb_dir": 0.5636363636363636, "dns_rmse": 0.5694531770207756, "dns_mae": 0.4374107051848993, "dns_dir": 0.7090909090909091, "ensemble_rmse": 0.6349894762785215, "ensemble_mae": 0.4867312970737407, "ensemble_dir": 0.5636363636363636, "rw_rmse": 0.6638866277802667, "rw_mae": 0.5043636363636363, "n": 55.0}, {"target": "yield_10y", "h": 12, "varx_rmse": 1.1878890814265683, "varx_mae": 0.9623307068806384, "varx_dir": 0.2291666666666666, "xgb_rmse": 1.0335934934314837, "xgb_mae": 0.8030057892512134, "xgb_dir": 0.6458333333333334, "dns_rmse": 1.018190109658084, "dns_mae": 0.8000609463318477, "dns_dir": 0.625, "ensemble_rmse": 1.039659967294812, "ensemble_mae": 0.8103544307896798, "ensemble_dir": 0.5833333333333334, "rw_rmse": 1.0697205433272403, "rw_mae": 0.84, "n": 49.0}, {"target": "yield_10y", "h": 24, "varx_rmse": 2.162128689667586, "varx_mae": 1.8994660798074352, "varx_dir": 0.081081081081081, "xgb_rmse": 1.7099063446870078, "xgb_mae": 1.485268409483036, "xgb_dir": 0.6486486486486487, "dns_rmse": 1.7609026063269682, "dns_mae": 1.5518100302753512, "dns_dir": 0.6756756756756757, "ensemble_rmse": 1.8184892454412072, "ensemble_mae": 1.58271877226964, "ensemble_dir": 0.5945945945945946, "rw_rmse": 1.9077232787037297, "rw_mae": 1.6159459459459462, "n": 37.0}, {"target": "yield_2y", "h": 1, "varx_rmse": 0.3117712372132573, "varx_mae": 0.2292021480321501, "varx_dir": 0.5172413793103449, "xgb_rmse": 0.3038260244442846, "xgb_mae": 0.2264360028600301, "xgb_dir": 0.5344827586206896, "dns_rmse": 0.3599189580541083, "dns_mae": 0.2637124979204893, "dns_dir": 0.4827586206896552, "ensemble_rmse": 0.3084160689238553, "ensemble_mae": 0.22443160834225, "ensemble_dir": 0.5, "rw_rmse": 0.3067735321047107, "rw_mae": 0.222, "n": 60.0}, {"target": "yield_2y", "h": 6, "varx_rmse": 1.0231529473611134, "varx_mae": 0.7694527557825965, "varx_dir": 0.3703703703703703, "xgb_rmse": 0.8738026718974824, "xgb_mae": 0.6672488838210873, "xgb_dir": 0.7037037037037037, "dns_rmse": 0.9891154051269988, "dns_mae": 0.7549026433794339, "dns_dir": 0.5185185185185185, "ensemble_rmse": 0.9413273172454616, "ensemble_mae": 0.6859380929146592, "ensemble_dir": 0.5925925925925926, "rw_rmse": 0.9754644581382294, "rw_mae": 0.7076363636363636, "n": 55.0}, {"target": "yield_2y", "h": 12, "varx_rmse": 1.890944021055108, "varx_mae": 1.4617714021131376, "varx_dir": 0.2448979591836734, "xgb_rmse": 1.5798790314632756, "xgb_mae": 1.1800287034748722, "xgb_dir": 0.8775510204081632, "dns_rmse": 1.7288935316515162, "dns_mae": 1.3696975030322105, "dns_dir": 0.5306122448979592, "ensemble_rmse": 1.7038406813554348, "ensemble_mae": 1.2986698887944268, "ensemble_dir": 0.5714285714285714, "rw_rmse": 1.7872507675540243, "rw_mae": 1.3559183673469388, "n": 49.0}, {"target": "yield_2y", "h": 24, "varx_rmse": 3.252252087129061, "varx_mae": 2.7003637219010708, "varx_dir": 0.1621621621621621, "xgb_rmse": 2.6169948946025112, "xgb_mae": 2.13921222014712, "xgb_dir": 0.945945945945946, "dns_rmse": 2.753913604398531, "dns_mae": 2.447356884044643, "dns_dir": 0.6756756756756757, "ensemble_rmse": 2.8376520168911616, "ensemble_mae": 2.3636973649741044, "ensemble_dir": 0.6486486486486487, "rw_rmse": 2.9957005226860747, "rw_mae": 2.463783783783784, "n": 37.0}], "holdout": {"v2": 0.38751685507792927, "x2": 0.29115593747656715, "n2": 0.23250117363062445, "e2": 0.3047389860904848, "r2": 0.34984123383170374, "v10": 0.3570062400928842, "x10": 0.37636405279055796, "n10": 0.18824164857900688, "e10": 0.28770985735764437, "r10": 0.2998888683051327}, "tests": [{"levers": {"uk": {"kind": "flat", "targets": {"UK_2y": 5.0, "UK_10y": 5.5}, "start": 0, "end": 24}}, "expected": {"yield_3m": [3.875659, 3.912584, 3.941444, 3.968996, 3.996321, 4.023566, 4.050765, 4.077934, 4.105083, 4.132217, 4.159342, 4.18646, 4.213573, 4.240683, 4.267792, 4.294898, 4.322004, 4.349109, 4.376213, 4.403317, 4.430421, 4.457524, 4.484628, 4.511731], "yield_2y": [4.437327, 4.458165, 4.468172, 4.476345, 4.484073, 4.491597, 4.498994, 4.506304, 4.513556, 4.520767, 4.527949, 4.535113, 4.542263, 4.549405, 4.55654, 4.563671, 4.570799, 4.577924, 4.585049, 4.592172, 4.599295, 4.606417, 4.613539, 4.620661], "yield_10y": [4.905373, 4.91705, 4.907291, 4.895566, 4.883228, 4.870579, 4.85773, 4.844746, 4.831668, 4.818527, 4.805341, 4.792125, 4.778889, 4.765638, 4.752377, 4.739109, 4.725837, 4.712561, 4.699283, 4.686004, 4.672724, 4.659443, 4.646161, 4.63288]}}, {"levers": {"japan": {"kind": "ramp", "targets": {"JP_2y": 1.5, "JP_10y": 2.5}, "start": 0, "end": 12}}, "expected": {"yield_3m": [3.865912, 3.89441, 3.921658, 3.94866, 3.975555, 4.002385, 4.029172, 4.055928, 4.082664, 4.109386, 4.136099, 4.162804, 4.189288, 4.216311, 4.243409, 4.270514, 4.297619, 4.324724, 4.351829, 4.378933, 4.406037, 4.43314, 4.460244, 4.487347], "yield_2y": [4.289182, 4.290178, 4.289356, 4.287996, 4.286354, 4.284528, 4.282576, 4.280539, 4.278442, 4.276305, 4.27414, 4.271956, 4.278328, 4.285361, 4.292482, 4.299611, 4.306739, 4.313865, 4.320989, 4.328113, 4.335235, 4.342358, 4.34948, 4.356602], "yield_10y": [4.748745, 4.725253, 4.699956, 4.673883, 4.647374, 4.620575, 4.593579, 4.566448, 4.539224, 4.511936, 4.484603, 4.457241, 4.442598, 4.429244, 4.415969, 4.402699, 4.389427, 4.376151, 4.362873, 4.349594, 4.336314, 4.323033, 4.309751, 4.29647]}}, {"levers": {"vix": {"kind": "step", "targets": {"vix": 35.0}, "start": 6, "end": 24}}, "expected": {"yield_3m": [3.865961, 3.895315, 3.923689, 3.951957, 3.980213, 4.002509, 4.022998, 4.043254, 4.063483, 4.083708, 4.103932, 4.124156, 4.144381, 4.164605, 4.18483, 4.205054, 4.225278, 4.245503, 4.265727, 4.285951, 4.306176, 4.3264, 4.346625, 4.366849], "yield_2y": [4.298753, 4.310776, 4.321633, 4.332348, 4.343046, 4.33138, 4.317475, 4.30327, 4.289028, 4.274782, 4.260536, 4.246289, 4.232042, 4.217795, 4.203549, 4.189302, 4.175055, 4.160808, 4.146562, 4.132315, 4.118068, 4.103821, 4.089575, 4.075328], "yield_10y": [4.763102, 4.756525, 4.749109, 4.741536, 4.733943, 4.690245, 4.643304, 4.596064, 4.548783, 4.501497, 4.454211, 4.406924, 4.359638, 4.312351, 4.265064, 4.217778, 4.170491, 4.123205, 4.075918, 4.028632, 3.981345, 3.934058, 3.886772, 3.839485]}}, {"levers": {"credit": {"kind": "flat", "targets": {"IG_OAS": 1.6, "HY_OAS": 6.0}, "start": 0, "end": 24}, "germany": {"kind": "ramp", "targets": {"DE_2y": 3.0, "DE_10y": 3.5}, "start": 0, "end": 18}, "fx": {"kind": "flat", "targets": {"DEXJPUS": 175.07600000000002, "DEXUSUK": 1.4817, "DEXUSEU": 1.26709, "DEXCHUS": 7.4259900000000005}, "start": 0, "end": 24}, "unemployment": {"kind": "step", "targets": {"unemployment": 6.0}, "start": 3, "end": 24}}, "expected": {"yield_3m": [4.072085, 4.113331, 4.144962, 4.174632, 4.204034, 4.233373, 4.262667, 4.291932, 4.321176, 4.350406, 4.379627, 4.40884, 4.438049, 4.467255, 4.496459, 4.525661, 4.554862, 4.584063, 4.611167, 4.638271, 4.665375, 4.692479, 4.719582, 4.746686], "yield_2y": [4.305346, 4.340569, 4.358341, 4.378954, 4.399188, 4.419233, 4.439153, 4.458986, 4.478761, 4.498494, 4.5182, 4.537887, 4.55756, 4.577225, 4.596883, 4.616537, 4.636188, 4.655837, 4.662961, 4.670084, 4.677207, 4.68433, 4.691452, 4.698574], "yield_10y": [5.431946, 5.455094, 5.466147, 5.468159, 5.470328, 5.472194, 5.473863, 5.475396, 5.476836, 5.478212, 5.479543, 5.480845, 5.482126, 5.483392, 5.484649, 5.485899, 5.487144, 5.488386, 5.475108, 5.461829, 5.448549, 5.435268, 5.421986, 5.408704]}}]};
+const E = window.YieldEngine, H = E.H;
+const LABELS = { uk: "UK yields (2y + 10y)", japan: "Japan yields (2y + 10y)", germany: "Germany yields (2y + 10y)",
+  unemployment: "US unemployment", fx: "FX (JPY, GBP, EUR, CNY)", credit: "Credit spreads (IG + HY)", vix: "Volatility (VIX)" };
+const UNITS = { uk: "%", japan: "%", germany: "%", unemployment: "%", fx: "", credit: "%", vix: " pts" };
+const C = { y3: "#a569bd", y2: "#4a9eda", y10: "#e05c4a", grey: "#9a9a9a", amber: "#e8a33d", green: "#3fae6d" };
+const BAND = { "#a569bd": "165,105,189", "#4a9eda": "43,123,186", "#e05c4a": "192,57,43" };
+const SERIES = [["yield_3m", C.y3, "3m"], ["yield_2y", C.y2, "2y"], ["yield_10y", C.y10, "10y"]];
+const fmt = (v, d = 2) => v == null || isNaN(v) ? "n/a" : v.toFixed(d);
+const sgn = (v, d = 3) => (v >= 0 ? "+" : "") + v.toFixed(d);
+const pct = (v, d = 1) => (v * 100).toFixed(d) + "%";
+const $ = id => document.getElementById(id);
+
+function sliderRange(g, col, cur) {
+  if (["uk", "japan", "germany"].includes(g)) return [-1, 8, 0.05];
+  if (g === "unemployment") return [3, 15, 0.1];
+  if (g === "vix") return [9, 80, 0.5];
+  if (g === "credit") return col === "IG_OAS" ? [0.4, 4, 0.05] : [2, 15, 0.1];
+  const lo = cur * 0.6, hi = cur * 1.4; return [lo, hi, (hi - lo) / 200];
+}
+
+// ---------------------------------------------------------------- state
+const state = { advanced: false, active: [], z: 1, settings: {} };
+for (const g in D.leverGroups) {
+  const targets = {};
+  for (const c of D.leverGroups[g]) { const [lo, hi] = sliderRange(g, c, D.leverNow[c]); targets[c] = Math.min(hi, Math.max(lo, D.leverNow[c])); }
+  state.settings[g] = { kind: "flat", start: 6, end: H, targets };
+}
+const flags = Object.fromEntries(D.flags.map(f => [f.lever, f]));
+
+// ---------------------------------------------------------------- static numbers
+const base = E.compute(D, null);
+const live = D.live, liveDate = [live.y2.date, live.y10.date, live.y3m.date].sort().pop();
+const s10y3m = live.y10.value - live.y3m.value, s10y2y = live.y10.value - live.y2.value;
+const pNow = { p_rec_10y3m: E.recessionProb(D, s10y3m, "10y3m"), p_rec_10y2y: E.recessionProb(D, s10y2y, "10y2y") };
+const pBase24 = base.p_rec_10y3m[H - 1];
+const rw = Object.fromEntries(SERIES.map(([c]) => [c, Array(H).fill(D.lastLevel[c])]));
+
+$("dates").innerHTML = `Snapshot of the live app. Market data as of <b>${liveDate}</b> (FRED). Model forecast anchored at <b>${D.anchor}</b>, because UK (BoE) and Japan (MOF) data lag US and German data, and the model needs every input on the same month.`;
+
+// ---------------------------------------------------------------- controls
+function renderLeverList() {
+  const box = $("lever-list");
+  box.querySelectorAll("label").forEach(n => n.remove());
+  $("mode-hint").textContent = state.advanced
+    ? "Several levers at once form a joint stress scenario, not a clean marginal effect."
+    : "One lever group at a time. Everything else stays at the model's baseline.";
+  box.querySelector("legend").textContent = state.advanced ? "Active levers" : "Active lever";
+  const opts = state.advanced ? [] : [["", "None (baseline)"]];
+  Object.keys(LABELS).forEach((g, i) => opts.push([g, `${i + 1} · ${LABELS[g]}`]));
+  for (const [g, text] of opts) {
+    const l = document.createElement("label"); l.className = "opt";
+    const inp = document.createElement("input");
+    inp.type = state.advanced ? "checkbox" : "radio"; inp.name = "lever"; inp.value = g; inp.id = "lv-" + (g || "none");
+    inp.checked = g ? state.active.includes(g) : state.active.length === 0;
+    inp.addEventListener("change", () => {
+      if (state.advanced) state.active = [...box.querySelectorAll("input:checked")].map(x => x.value);
+      else state.active = g ? [g] : [];
+      renderControls(); update();
+    });
+    l.append(inp, document.createTextNode(text)); box.append(l);
+  }
+}
+
+function renderControls() {
+  const box = $("controls"); box.innerHTML = "";
+  for (const g of state.active) {
+    const s = state.settings[g], wrap = document.createElement("div"); wrap.className = "group";
+    let html = `<div class="gname">${LABELS[g]}</div>`;
+    const f = flags[g];
+    if (f) html += `<div class="flag ${String(f.flag).toLowerCase() === "sign" ? "sign" : ""}"><b>${String(f.flag).toUpperCase()}</b>: ${f.detail}${String(f.flag).toLowerCase() === "sign" ? ". This lever's fitted effect contradicts economic priors; treat its output as unreliable." : ""}</div>`;
+    html += `<div style="display:grid;gap:4px"><label class="hint" for="kind-${g}">Path shape</label>
+      <select id="kind-${g}"><option value="flat">flat: jumps now and stays</option><option value="ramp">ramp: moves linearly to target</option><option value="step">step: holds, then jumps</option></select></div>`;
+    if (s.kind === "step") html += sliderHtml(`start-${g}`, "Step lands at month", 1, H, 1, s.start, 0);
+    if (s.kind === "ramp") html += sliderHtml(`end-${g}`, "Target reached by month", 1, H, 1, s.end, 0);
+    html += `<p class="hint">Shape changes the timing, not the 24-month endpoint: the model works on changes, so the total effect depends only on the total move in the lever.</p>`;
+    for (const c of D.leverGroups[g]) {
+      const [lo, hi, st] = sliderRange(g, c, D.leverNow[c]);
+      html += sliderHtml(`t-${g}-${c}`, `${c} <span class="hint">now ${fmt(D.leverNow[c], 3)}${UNITS[g]}</span>`, lo, hi, st, s.targets[c], 3);
+      html += `<div class="extrap" id="x-${g}-${c}" hidden></div>`;
+    }
+    wrap.innerHTML = html; box.append(wrap);
+    const kind = wrap.querySelector(`#kind-${g}`); kind.value = s.kind;
+    kind.addEventListener("change", () => { s.kind = kind.value; renderControls(); update(); });
+    wrap.querySelectorAll("input[type=range]").forEach(inp => inp.addEventListener("input", () => {
+      const v = +inp.value, id = inp.id;
+      if (id.startsWith("start-")) s.start = v; else if (id.startsWith("end-")) s.end = v;
+      else s.targets[id.slice(`t-${g}-`.length)] = v;
+      inp.closest(".slider").querySelector(".val").textContent = id.startsWith("t-") ? fmt(v, 3) : v;
+      checkExtrap(g); update();
+    }));
+    checkExtrap(g);
+  }
+}
+function sliderHtml(id, label, lo, hi, step, val, dec) {
+  return `<div class="slider"><label for="${id}"><span>${label}</span><span class="val">${dec ? fmt(val, dec) : val}</span></label>
+    <input type="range" id="${id}" min="${lo}" max="${hi}" step="${step}" value="${val}"></div>`;
+}
+function checkExtrap(g) {
+  for (const c of D.leverGroups[g]) {
+    const el = $(`x-${g}-${c}`); if (!el) continue;
+    const v = state.settings[g].targets[c], [lo, hi] = D.leverRange[c];
+    el.hidden = !(v < lo || v > hi);
+    el.textContent = `Extrapolating: ${fmt(v, 3)} is outside the range seen in training (${fmt(lo, 3)} to ${fmt(hi, 3)}). Treat the effect as a guess.`;
+  }
+}
+
+$("advanced").addEventListener("change", e => {
+  state.advanced = e.target.checked;
+  if (!state.advanced) state.active = state.active.slice(0, 1);
+  renderLeverList(); renderControls(); update();
+});
+$("reset").addEventListener("click", () => {
+  state.active = []; renderLeverList(); renderControls(); update();
+});
+$("ci").addEventListener("change", e => { state.z = +e.target.value; update(); });
+
+// ---------------------------------------------------------------- charts
+function themeColors() {
+  const cs = getComputedStyle(document.documentElement);
+  const g = n => cs.getPropertyValue(n).trim();
+  return { ink: g("--ink"), muted: g("--muted"), grid: g("--grid"), vline: g("--vline"), sheet: g("--sheet") };
+}
+function axisStyle(T) {
+  return { gridcolor: T.grid, zerolinecolor: T.grid, linecolor: T.grid, tickfont: { color: T.muted, size: 11 }, titlefont: { color: T.muted, size: 11 } };
+}
+const narrow = () => window.innerWidth < 600;
+const bandLabel = () => $("ci").selectedOptions[0].textContent.split(" ")[0];
+
+function leverPayload() {
+  if (!state.active.length) return null;
+  const out = {}; for (const g of state.active) out[g] = state.settings[g]; return out;
+}
+
+function update() {
+  const T = themeColors(), lev = leverPayload(), adj = lev ? E.compute(D, lev) : null;
+  renderMetrics(adj); drawMain(T, adj); drawPaths(T, adj);
+}
+
+function renderMetrics(adj) {
+  const m = [
+    ["2y now", `${fmt(live.y2.value)}%`, `FRED DGS2 · ${live.y2.date}`],
+    ["10y now", `${fmt(live.y10.value)}%`, `FRED DGS10 · ${live.y10.date}`],
+    ["10y − 2y now", sgn(s10y2y, 2), "pp"],
+    ["10y − 3m now", sgn(s10y3m, 2), "pp"],
+    ["P(recession) 12m, today", pct(pNow.p_rec_10y3m), "from today's 10y − 3m"],
+    ["P(recession) at month 24, baseline", pct(pBase24), `<span class="${pBase24 > pNow.p_rec_10y3m ? "up" : "down"}">${sgn((pBase24 - pNow.p_rec_10y3m) * 100, 1)}pp vs today</span>`],
+  ];
+  if (adj) {
+    const p = adj.p_rec_10y3m[H - 1];
+    m.push(["P(recession) at month 24, lever", pct(p), `<span class="${p > pBase24 ? "up" : "down"}">${sgn((p - pBase24) * 100, 1)}pp vs baseline</span>`, true]);
+  }
+  $("metrics").innerHTML = m.map(([k, v, d, l]) => `<div class="metric${l ? " lever" : ""}"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
+  const eff = $("effect");
+  if (adj) {
+    const d2 = adj.yield_2y[H - 1] - base.yield_2y[H - 1], d10 = adj.yield_10y[H - 1] - base.yield_10y[H - 1];
+    const dp = adj.p_rec_10y3m[H - 1] - base.p_rec_10y3m[H - 1];
+    const head = state.active.length > 1 ? `Combined lever effect at 24 months (${state.active.map(g => LABELS[g]).join(" + ")})` : `${LABELS[state.active[0]]}: effect at 24 months`;
+    eff.innerHTML = `<b>${head}</b>: 2y <span class="num">${sgn(d2)}</span>pp · 10y <span class="num">${sgn(d10)}</span>pp · spread <span class="num">${sgn(d10 - d2)}</span>pp · P(recession) <span class="num">${sgn(dp * 100, 1)}</span>pp`;
+    eff.hidden = false;
+  } else eff.hidden = true;
+}
+
+function lineTrace(x, y, name, color, width, dash, extra) {
+  return Object.assign({ x, y, name, type: "scatter", mode: "lines", line: { color, width, dash: dash || "solid" },
+    hovertemplate: "%{y:.3f}<extra>" + name + "</extra>" }, extra || {});
+}
+function bandTraces(y, sig, color, name, axes) {
+  const hi = y.map((v, i) => v + state.z * sig[i]), lo = y.map((v, i) => v - state.z * sig[i]);
+  return [
+    Object.assign({ x: D.future, y: hi, type: "scatter", mode: "lines", line: { width: 0 }, showlegend: false, hoverinfo: "skip" }, axes),
+    Object.assign({ x: D.future, y: lo, type: "scatter", mode: "lines", line: { width: 0 }, fill: "tonexty",
+      fillcolor: `rgba(${BAND[color]},0.14)`, name: `${name} ${bandLabel()} band`, hoverinfo: "skip" }, axes),
+  ];
+}
+
+function drawMain(T, adj) {
+  const t = [], ax = (n, lg) => ({ xaxis: "x" + (n > 1 ? n : ""), yaxis: "y" + (n > 1 ? n : ""), legend: lg });
+  for (const [c, col, nm] of SERIES) {
+    const a = ax(1, "legend");
+    t.push(lineTrace(D.hist.dates, D.hist[c], `${nm} history`, col, 1.6, "solid", a));
+    const ens = D.ensemble[c], main = ens || base[c];
+    const label = ens ? "Ensemble" : "VARX baseline (no ensemble for 3m)";
+    t.push(...bandTraces(main, D.sigma[c], col, nm, a));
+    const mem = [base[c], D.base.xgb[c], D.base.dns[c], rw[c]];
+    t.push(lineTrace(D.future, D.future.map((_, i) => Math.max(...mem.map(m => m[i]))), `${nm} model range`, col, 1, "dot", Object.assign({ opacity: 0.6 }, a)));
+    t.push(lineTrace(D.future, D.future.map((_, i) => Math.min(...mem.map(m => m[i]))), `${nm} model range`, col, 1, "dot", Object.assign({ opacity: 0.6, showlegend: false }, a)));
+    t.push(lineTrace(D.future, rw[c], `${nm} random walk`, T.muted, 1.1, "longdash", Object.assign({ opacity: 0.7 }, a)));
+    t.push(lineTrace(D.future, main, `${nm} ${label}`, col, 2.6, "longdashdot", a));
+    if (adj) t.push(lineTrace(D.future, adj[c], `${nm} LEVER`, col, 3.4, "solid", a));
+  }
+  for (const [c, col, nm, sub] of [["term_spread_us", C.amber, "10y−2y", "yield_2y"], ["term_spread_us_3m", C.green, "10y−3m", "yield_3m"]]) {
+    const a = ax(2, "legend2");
+    t.push(lineTrace(D.hist.dates, D.hist.yield_10y.map((v, i) => v - D.hist[sub][i]), `${nm} history`, col, 1.4, "solid", a));
+    t.push(lineTrace(D.future, base[c], `${nm} baseline`, col, 2.4, "dash", a));
+    if (adj) t.push(lineTrace(D.future, adj[c], `${nm} LEVER`, col, 3.2, "solid", a));
+  }
+  for (const [c, col, nm] of [["p_rec_10y3m", C.green, "from 10y−3m"], ["p_rec_10y2y", C.amber, "from 10y−2y"]]) {
+    const a = ax(3, "legend3"), x = [D.anchor, ...D.future];
+    t.push(lineTrace(x, [pNow[c], ...base[c]], `P(rec) ${nm}`, col, 2.4, "dash", Object.assign({ hovertemplate: "%{y:.1%}<extra>P(rec) " + nm + "</extra>" }, a)));
+    if (adj) t.push(lineTrace(x, [pNow[c], ...adj[c]], `P(rec) ${nm} LEVER`, col, 3.2, "solid", Object.assign({ hovertemplate: "%{y:.1%}<extra>LEVER " + nm + "</extra>" }, a)));
+  }
+  const n = narrow(), d1 = n ? [0.62, 1] : [0.6, 1], d2 = n ? [0.33, 0.5] : [0.33, 0.5], d3 = [0.05, 0.22];
+  const A = axisStyle(T), lk = { orientation: "h", x: 0, xanchor: "left", yanchor: "top", font: { size: n ? 9 : 10, color: T.ink }, bgcolor: "rgba(0,0,0,0)" };
+  const ttl = (txt, y) => ({ text: txt, xref: "paper", yref: "paper", x: 0, y, xanchor: "left", yanchor: "bottom", showarrow: false, font: { size: 13, color: T.ink, family: "IBM Plex Sans, sans-serif" } });
+  const layout = {
+    paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)", font: { family: "IBM Plex Sans, sans-serif", color: T.ink },
+    margin: { l: 52, r: 12, t: 28, b: 10 }, hovermode: "x unified", hoverlabel: { bgcolor: T.sheet, font: { color: T.ink } },
+    xaxis: Object.assign({ domain: [0, 1], anchor: "y", matches: "x3" }, A), yaxis: Object.assign({ domain: d1, title: { text: "yield (%)" } }, A),
+    xaxis2: Object.assign({ anchor: "y2", matches: "x3" }, A), yaxis2: Object.assign({ domain: d2, title: { text: "spread (pp)" } }, A),
+    xaxis3: Object.assign({ anchor: "y3" }, A), yaxis3: Object.assign({ domain: d3, title: { text: "probability" }, tickformat: ".0%" }, A),
+    legend: Object.assign({ y: d1[0] - 0.035 }, lk), legend2: Object.assign({ y: d2[0] - 0.035 }, lk), legend3: Object.assign({ y: d3[0] - 0.035 }, lk),
+    annotations: [ttl(`3m, 2y and 10y yields: ensemble forecast, GARCH ${bandLabel()} band`, d1[1]), ttl("Term spreads", d2[1]), ttl("P(US recession within 12 months), VARX path", d3[1])],
+    shapes: [
+      ...["", "2", "3"].map(k => ({ type: "line", xref: "x" + k, yref: "y" + k + " domain", x0: D.anchor, x1: D.anchor, y0: 0, y1: 1, line: { color: T.vline, width: 1, dash: "dot" } })),
+      { type: "line", xref: "x2 domain", yref: "y2", x0: 0, x1: 1, y0: 0, y1: 0, line: { color: "#c0392b", width: 1 } },
+    ],
+  };
+  Plotly.react("main-chart", t, layout, { displayModeBar: false, responsive: true });
+}
+
+function drawPaths(T, adj) {
+  const t = [];
+  for (const [c, col, nm] of SERIES) {
+    t.push(lineTrace(D.hist.dates, D.hist[c], `${nm} history`, col, 1.6));
+    t.push(...bandTraces(base[c], D.sigma[c], col, nm, {}));
+    t.push(lineTrace(D.future, base[c], `${nm} VARX baseline`, col, 2.6, "dash"));
+    t.push(lineTrace(D.future, D.base.xgb[c], `${nm} XGBoost`, col, 1.3, "dot", { opacity: 0.8 }));
+    t.push(lineTrace(D.future, D.base.dns[c], `${nm} Diebold-Li`, col, 1.3, "dashdot", { opacity: 0.8 }));
+    t.push(lineTrace(D.future, rw[c], `${nm} random walk`, T.muted, 1.1, "longdash", { opacity: 0.7 }));
+    if (adj) t.push(lineTrace(D.future, adj[c], `${nm} LEVER (VARX)`, col, 3.4));
+  }
+  const A = axisStyle(T);
+  Plotly.react("paths-chart", t, {
+    paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)", font: { family: "IBM Plex Sans, sans-serif", color: T.ink },
+    margin: { l: 52, r: 12, t: 10, b: 10 }, hovermode: "x unified", hoverlabel: { bgcolor: T.sheet, font: { color: T.ink } },
+    xaxis: A, yaxis: Object.assign({ title: { text: "yield (%)" } }, A),
+    legend: { orientation: "h", x: 0, y: -0.1, yanchor: "top", font: { size: narrow() ? 9 : 10, color: T.ink } },
+    shapes: [{ type: "line", xref: "x", yref: "paper", x0: D.anchor, x1: D.anchor, y0: 0, y1: 1, line: { color: T.vline, width: 1, dash: "dot" } }],
+  }, { displayModeBar: false, responsive: true });
+}
+
+// ---------------------------------------------------------------- tables
+function table(head, rows, leftCols = 1) {
+  return `<table><thead><tr>${head.map((h, i) => `<th class="${i < leftCols ? "t" : ""}">${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map((v, i) => typeof v === "object" ? `<td class="${v.cls || ""}">${v.v}</td>` : `<td class="${i < leftCols ? "t" : ""}">${v}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+(function tables() {
+  const bt = D.backtest, nm = { yield_2y: "2y", yield_10y: "10y" };
+  const ratio = (r, k) => { const v = r[k + "_rmse"] / r.rw_rmse; return { v: v.toFixed(2), cls: v < 1 ? "win" : "" }; };
+  $("bt").innerHTML = table(["Target", "Horizon", "VARX", "XGB", "DNS", "Ensemble", "RW", "VARX/RW", "XGB/RW", "DNS/RW", "Ens/RW", "VARX dir", "XGB dir", "DNS dir", "Ens dir"],
+    bt.map(r => [nm[r.target] || r.target, r.h + "m", fmt(r.varx_rmse, 3), fmt(r.xgb_rmse, 3), fmt(r.dns_rmse, 3), fmt(r.ensemble_rmse, 3), fmt(r.rw_rmse, 3),
+      ratio(r, "varx"), ratio(r, "xgb"), ratio(r, "dns"), ratio(r, "ensemble"),
+      pct(r.varx_dir, 0), pct(r.xgb_dir, 0), pct(r.dns_dir, 0), pct(r.ensemble_dir, 0)]), 2);
+  const vr = bt.map(r => r.varx_rmse / r.rw_rmse), r10 = bt.filter(r => r.target === "yield_10y");
+  const all = (rows, k) => rows.every(r => r[k + "_rmse"] < r.rw_rmse);
+  const d24 = t => bt.find(r => r.h === 24 && r.target === t);
+  const a = d24("yield_2y"), b = d24("yield_10y");
+  $("bt-cap").innerHTML = `VARX ${vr.some(v => v < 1) ? "beats" : "does <b>not</b> beat"} a random walk at any horizon (ratios ${Math.min(...vr).toFixed(2)}–${Math.max(...vr).toFixed(2)}). On the 10y, XGBoost ${all(r10, "xgb") ? "beats" : "does not consistently beat"} the random walk, Diebold-Li ${all(r10, "dns") ? "beats" : "does not consistently beat"} it, and the ensemble ${all(r10, "ensemble") ? "beats" : "does not consistently beat"} it. The ensemble is built to be robust rather than best: it rarely loses badly. 24-month directional accuracy (2y / 10y): VARX ${pct(a.varx_dir, 0)}/${pct(b.varx_dir, 0)}, XGB ${pct(a.xgb_dir, 0)}/${pct(b.xgb_dir, 0)}, DNS ${pct(a.dns_dir, 0)}/${pct(b.dns_dir, 0)}, Ensemble ${pct(a.ensemble_dir, 0)}/${pct(b.ensemble_dir, 0)}. Read the <b>lever deltas</b>, not the absolute path.`;
+  const rc = D.recession.spread_10y3m_full;
+  $("rec-kv").innerHTML = `<div><div class="hint">Brier score (out-of-sample)</div><div class="num" style="font-size:1.3rem">${rc.oos_brier.toFixed(4)}</div><div class="hint">lower is better · base rate 0.0886</div></div>
+    <div><div class="hint">AUC (out-of-sample)</div><div class="num" style="font-size:1.3rem">${rc.oos_auc.toFixed(3)}</div><div class="hint">1.0 = perfect ranking</div></div>`;
+  const h = D.holdout;
+  if (h) {
+    const row = (lab, k) => { const vals = ["v", "x", "n", "e", "r"].map(p => h[p + k]); const best = Math.min(...vals);
+      return [lab, ...vals.map(v => ({ v: v.toFixed(3), cls: v === best ? "win" : "" }))]; };
+    $("holdout").innerHTML = table(["", "VARX", "XGB", "DNS", "Ens", "RW"], [row("2y", "2"), row("10y", "10")]);
+  }
+  const wr = [];
+  for (const t in D.ensWeights) for (const hh of ["1", "6", "12", "24"]) { const w = D.ensWeights[t][hh];
+    wr.push([nm[t] || t, hh + "m", pct(w.varx, 0), pct(w.xgb, 0), pct(w.dns, 0), pct(w.rw, 0)]); }
+  $("weights").innerHTML = table(["Target", "Horizon", "VARX", "XGB", "DNS", "RW"], wr, 2);
+  $("resp").innerHTML = table(["Lever", "Shock", "24m on 2y", "24m on 10y", "On spread", "max |t|", "Prior", "Verdict"],
+    D.responses.map(r => [r.lever, r.shock, sgn(r.d_2y), sgn(r.d_10y), sgn(r.d_spread), r.max_abs_t == null ? "n/a" : r.max_abs_t.toFixed(2),
+      { v: r.prior, cls: "wrap" }, { v: r.verdict, cls: "wrap" }]), 2);
+  const R = l => D.responses.find(r => r.lever === l) || {};
+  $("resp-notes").innerHTML = [
+    `<b>UK</b> moves US yields up strongly and significantly (|t| = ${R("uk").max_abs_t.toFixed(1)}), lifting the 10y more than the 2y (${sgn(R("uk").d_10y)} vs ${sgn(R("uk").d_2y)}): a clean term-premium repricing.`,
+    `<b>Japan</b> uses a level/slope reparametrization to fix collinearity between JP 2y and 10y. Its effect on the US 10y is positive (${sgn(R("japan").d_10y)}), matching theory, but not significant (|t| = ${R("japan").max_abs_t.toFixed(2)}).`,
+    `<b>Germany</b> is a separate side-model fitted on its own ${D.addons.germany.nobs}-month window. Its 2y response (${sgn(R("germany").d_2y)}) is larger than its 10y response (${sgn(R("germany").d_10y)}), so it is flagged for magnitude.`,
+    `<b>Unemployment</b> moves the 2y ${sgn(R("unemployment").d_2y)} and the 10y ${sgn(R("unemployment").d_10y)}: small and not significant (|t| = ${R("unemployment").max_abs_t.toFixed(2)}).`,
+    `<b>Credit spreads</b> show the inflation/supply regime on this sample: wider spreads come with higher long yields (${sgn(R("credit").d_10y)} on the 10y). Fitted on ${D.addons.credit.nobs} months since the 2023 OAS licence window.`,
+    `<b>VIX</b> shows the opposite, flight-to-quality regime: higher VIX comes with lower long yields (${sgn(R("vix").d_10y)} on the 10y). Not significant (|t| = ${R("vix").max_abs_t.toFixed(2)}).`,
+  ].map(s => `<li>${s}</li>`).join("");
+  $("rec-cap").innerHTML = `The recession panel and the P(recession) figures use the <b>VARX</b> path's spread only, through an Estrella-Mishkin probit. With no lever applied, the probability moves from ${pct(pNow.p_rec_10y3m)} today to ${pct(pBase24)} by month 24. That drift is VARX's own baseline view of where the curve goes, and the backtest says VARX does not beat a random walk, so treat it with skepticism.`;
+  $("foot").innerHTML = `Static snapshot of the Streamlit app, exported ${liveDate}. Forecast anchor ${D.anchor} · main VARX window ${D.panelStart} onward (${D.varx.nobs} months). US series from FRED; UK (Bank of England), Japan (MOF) and Germany (Bundesbank) yields from live sources. Lever scenarios are computed in your browser from the fitted model coefficients and match the Python app exactly.`;
+})();
+
+// ---------------------------------------------------------------- boot
+renderLeverList(); renderControls(); update();
+const rerender = () => update();
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rerender); } catch (e) {}
+new MutationObserver(rerender).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(rerender, 200); });
+if (location.hash === "#individual-model-paths") setTimeout(() => $("individual-model-paths").scrollIntoView(), 300);
+</script>
+</body>
+</html>

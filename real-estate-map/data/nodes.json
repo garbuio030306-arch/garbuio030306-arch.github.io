@@ -1,0 +1,72 @@
+{
+  "_comment": "Top-level tree skeleton for the Full Picture house floor-plan view. Deep children are NOT duplicated here -- js/app.js assembles them live from factors.json/segments.json/chains.json/picks.json via each category's childSource, so editing any data file updates the map immediately with no rebuild step. Only the Thesis category's own content (which doesn't live anywhere else) is inline here.",
+  "root": {
+    "id": "thesis_root",
+    "name": "European Rate-Sensitivity Thesis",
+    "provenance": "notes",
+    "source": "research.pdf p.1"
+  },
+  "categories": [
+    {
+      "id": "thesis",
+      "name": "Thesis",
+      "color": "thesis",
+      "childSource": "inline",
+      "children": [
+        {
+          "id": "thesis_statement",
+          "name": "Core thesis",
+          "provenance": "notes",
+          "source": "research.pdf p.1",
+          "detail": "European interest rates and government bond yields have risen to levels that are economically unsustainable and will eventually need to decline. This creates an opportunity to invest in undervalued, interest-rate-sensitive real estate and infrastructure companies before the market prices in that recovery."
+        },
+        {
+          "id": "thesis_betting_on",
+          "name": "What you're really betting on",
+          "provenance": "notes",
+          "source": "research.pdf p.1",
+          "detail": "You're looking for companies where: (1) the business itself remains fundamentally strong; (2) the share price has fallen primarily because of higher rates rather than permanent business deterioration; (3) there is significant upside if borrowing costs normalize; (4) the company can financially survive until that happens."
+        },
+        {
+          "id": "thesis_support_epra",
+          "name": "What supports you: EPRA 26.8% discount to NAV",
+          "provenance": "notes",
+          "source": "EPRA, https://www.epra.com/newsroom/insights/2026-year-normalisation-european-listed-real-estate (p.2)",
+          "detail": "European listed real estate traded at an average 26.8% discount to NAV in late 2025. Worked example from the notes: a property company owning EUR10bn of buildings with EUR4bn of net debt has NAV of EUR6bn; if the stock market values the company at EUR4.392bn, investors are paying EUR73.20 for every EUR100 of reported net property assets. UPDATE (added, Oct 2026): some mid-2026 commentary suggests the discount for larger listed European RE companies widened further, toward 40%+, by July 2026 -- i.e. the valuation gap may have widened rather than closed since the notes were written, though this specific figure's sourcing is weaker than the 26.8% EPRA figure and is flagged as lower-confidence rather than treated as confirmed."
+        },
+        {
+          "id": "thesis_inflation_correction",
+          "name": "CORRECTED: inflation/deflation claim",
+          "provenance": "notes",
+          "source": "research.pdf p.2; Eurostat",
+          "detail": "The notes originally claimed 'Europe is experiencing deflation' -- this is WRONG and contradicted by the very next line, sourced to Eurostat: inflation excluding energy is substantially lower than headline inflation, but Europe is NOT currently experiencing broad-based deflation.",
+          "flagRef": "deflation-contradiction"
+        }
+      ]
+    },
+    {
+      "id": "real_estate_vertical",
+      "name": "Real Estate Vertical",
+      "color": "chain",
+      "childSource": "chains:real_estate_vertical"
+    },
+    {
+      "id": "macro_factors",
+      "name": "Macro Factors",
+      "color": "factor",
+      "childSource": "factors"
+    },
+    {
+      "id": "re_segments",
+      "name": "Real Estate Segments & Rate Sensitivity",
+      "color": "segment",
+      "childSource": "segments"
+    },
+    {
+      "id": "funds_picks",
+      "name": "Funds & Picks",
+      "color": "pick",
+      "childSource": "picks"
+    }
+  ]
+}

@@ -1,0 +1,595 @@
+{
+  "_comment": "Real estate segments/sub-sectors. rateSensitivity.qualitative comes from the notes' Office/Residential/Retail/Industrial/Hospitality/Healthcare/Data-centres table (p.?, supplied directly by user as SEED DATA). rateSensitivity.score10 comes from the separate least->most /10 ranking (also SEED DATA, a DIFFERENT taxonomy built around business model/REIT type, not property type -- see the Research QA notes document ('segment-taxonomy-tension') for where the two tables disagree, e.g. Residential=High qualitatively but 'Healthcare & Residential REITs' scores only 5.0/10). Which factors hit a segment is NOT stored here -- it's derived at runtime from factors.json's segmentsHit[] so the heatmap/rankings stay data-driven. rateWhy explains why rates hit each segment the way they do.",
+  "segments": [
+    {
+      "id": "residential",
+      "name": "Residential (apartments / multifamily / SFR)",
+      "category": "primary-sector",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf p.3, p.?",
+      "drivers": [
+        "Population growth",
+        "Housing supply",
+        "Wages & affordability"
+      ],
+      "description": "Apartments, multifamily housing, single-family rentals, student accommodation. Revenue primarily from rent paid by individuals.",
+      "rateWhy": {
+        "text": "Buyers and landlords both fund homes with mortgages, so every rate rise makes the same flat more expensive to own. Values are set by comparing rental yield to bond yields, so higher yields push prices down. There is a partial offset: people priced out of buying keep renting, which supports rents. Net effect: values are very rate-exposed, rents much less so.",
+        "provenance": "added",
+        "source": "research.pdf p.4-5 (valuation mechanic), p.12 (renters who delay buying)"
+      }
+    },
+    {
+      "id": "office",
+      "name": "Office",
+      "category": "primary-sector",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": 7.5
+      },
+      "provenance": "notes",
+      "source": "research.pdf",
+      "drivers": [
+        "Employment",
+        "Tenant demand",
+        "Lease renewals",
+        "Workplace trends",
+        "Credit availability for CRE"
+      ],
+      "description": "Business parks, corporate headquarters, city-center offices. The Credit factor notes that tight lending hits office buildings hardest of all.",
+      "rateWhy": {
+        "text": "Offices are long-lived assets valued off cap rates, so when bond yields rise their values fall hard. Owners usually carry a lot of debt, and the notes flag office as the sector lenders avoid first when credit tightens, so refinancing is hardest here. Hybrid work has already weakened tenant demand, so owners cannot raise rents to cover higher interest costs.",
+        "provenance": "added",
+        "source": "research.pdf p.20-22 (Credit factor)"
+      }
+    },
+    {
+      "id": "retail",
+      "name": "Retail (malls / high-street / supermarkets)",
+      "category": "primary-sector",
+      "rateSensitivity": {
+        "qualitative": "Med-High",
+        "score10": 6.6
+      },
+      "provenance": "notes",
+      "source": "research.pdf",
+      "drivers": [
+        "Consumer spending",
+        "Tenant sales",
+        "Shopping habits"
+      ],
+      "description": "Shopping malls, high-street stores, supermarkets, retail parks.",
+      "rateWhy": {
+        "text": "Retail starts from higher yields than office, which gives some cushion before it looks expensive against bonds. Rates mostly reach it in two ways: higher mortgage payments squeeze shoppers' disposable income, and large shopping-centre owners carry heavy debt that has to be refinanced at today's rates.",
+        "provenance": "added",
+        "source": "General real estate finance mechanics; worked examples from research.pdf where cited"
+      }
+    },
+    {
+      "id": "industrial_logistics",
+      "name": "Industrial / Logistics",
+      "category": "primary-sector",
+      "rateSensitivity": {
+        "qualitative": "Med-High",
+        "score10": 5.8
+      },
+      "provenance": "notes",
+      "source": "research.pdf",
+      "drivers": [
+        "E-commerce",
+        "Supply chains",
+        "Trade & distribution demand"
+      ],
+      "description": "Warehouses, distribution centres, last-mile facilities, light industrial buildings.",
+      "rateWhy": {
+        "text": "Logistics was priced at very low yields in 2020-21, so it repriced sharply when rates rose. Strong rental growth from e-commerce and supply-chain demand offsets part of that. It is also development-heavy, so construction financing costs feed straight into returns on new warehouses.",
+        "provenance": "added",
+        "source": "General real estate finance mechanics; worked examples from research.pdf where cited"
+      }
+    },
+    {
+      "id": "hospitality",
+      "name": "Hospitality (hotels / resorts)",
+      "category": "primary-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf",
+      "drivers": [
+        "Tourism",
+        "Business travel",
+        "Occupancy rates",
+        "Room prices"
+      ],
+      "description": "Hotels, resorts, serviced apartments. Lags the cycle -- travel budgets cut and restored slowly.",
+      "rateWhy": {
+        "text": "Hotel income resets every night, so it keeps pace with inflation better than any long-lease sector. Rates hit hotels mainly through the economy: when borrowing costs squeeze households and companies, travel is one of the first budgets cut. Hotels are often financed with floating-rate debt, so interest costs rise quickly too.",
+        "provenance": "added",
+        "source": "research.pdf p.6 (discretionary travel), p.23 (hotels lag the cycle)"
+      }
+    },
+    {
+      "id": "healthcare",
+      "name": "Healthcare real estate",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": 5.0
+      },
+      "provenance": "notes",
+      "source": "research.pdf (qualitative table); SEED DATA /10 ranking groups it with Residential REITs",
+      "drivers": [
+        "Ageing population",
+        "Long-lease / often government-backed income",
+        "Demographics"
+      ],
+      "description": "Hospitals, medical offices, life-science buildings. Income tends to come from long leases, which makes it steadier than most -- that's why it scores only mid-range here even though financing costs still matter.",
+      "rateWhy": {
+        "text": "Long leases, often backed by governments or large operators, make healthcare income behave like a bond. That steadiness is why it scores mid-range: income barely moves with rates, but because investors value it like a bond, its price still falls when bond yields rise.",
+        "provenance": "added",
+        "source": "research.pdf qualitative table; SEED DATA /10 ranking"
+      }
+    },
+    {
+      "id": "data_centres",
+      "name": "Data centres",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf",
+      "drivers": [
+        "Tech / AI capex cycle",
+        "GDP & business investment",
+        "Power availability"
+      ],
+      "description": "Large-scale and shared data centres. Tracks tech company investment more than it tracks interest rates.",
+      "rateWhy": {
+        "text": "Demand comes from tech and AI investment, not from borrowing costs, so occupancy barely reacts to rates. The exposure is on the build side: data centres need huge upfront capital, mostly debt-funded, so a higher cost of capital cuts the return on each new site. Power availability is often a bigger constraint than rates.",
+        "provenance": "added",
+        "source": "General real estate finance mechanics; worked examples from research.pdf where cited"
+      }
+    },
+    {
+      "id": "towers",
+      "name": "Telecom towers",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Low-Medium",
+        "score10": 4.0
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "Long-term, often inflation-indexed lease income",
+        "Mobile data demand"
+      ],
+      "description": "Companies that own mobile network towers. Their income is locked into long contracts, so rates barely touch them.",
+      "rateWhy": {
+        "text": "Tower income comes from long contracts with mobile operators, often with built-in inflation increases, so higher rates barely touch revenue. The sector does carry debt and is valued as a long-duration income stream, so rising yields still lower valuation multiples somewhat.",
+        "provenance": "added",
+        "source": "SEED DATA /10 ranking"
+      }
+    },
+    {
+      "id": "student_housing",
+      "name": "Student housing",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Demographics factor, p.12)",
+      "drivers": [
+        "University enrolment",
+        "Demographics",
+        "Migration"
+      ],
+      "description": "Housing built for students. Tied to population and university enrollment trends.",
+      "rateWhy": {
+        "text": "Students do not take out mortgages, so demand follows university enrolment rather than borrowing costs. Leases reset every academic year, which lets rents track inflation. The rate exposure sits with the owner: financing costs and the yield investors demand for the buildings.",
+        "provenance": "added",
+        "source": "research.pdf p.12 (Demographics factor)"
+      }
+    },
+    {
+      "id": "senior_housing",
+      "name": "Senior housing",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Demographics factor, p.12, grouped with Healthcare)",
+      "drivers": [
+        "Ageing population",
+        "Healthcare demand"
+      ],
+      "description": "Assisted living and care homes for the elderly.",
+      "rateWhy": {
+        "text": "Demand is driven by ageing, not by credit. Rates matter in two indirect ways. New schemes are expensive to build and debt-financed. And many residents pay with money from selling their home, so a frozen housing market (lock-in) delays move-ins.",
+        "provenance": "added",
+        "source": "research.pdf p.12, p.17 (lock-in effect)"
+      }
+    },
+    {
+      "id": "manufactured_home_communities",
+      "name": "Manufactured-home communities",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Demographics & Supply factors)",
+      "drivers": [
+        "Retiree demand",
+        "Affordability-driven demand",
+        "Land-lease model"
+      ],
+      "description": "Housing communities popular with retirees, often on leased land.",
+      "rateWhy": {
+        "text": "Residents own their homes and rent the land underneath, so turnover is very low and rent increases are steady. Expensive mortgages push more buyers toward this cheaper option, which supports demand. Valuations still move with bond yields like any income-producing property.",
+        "provenance": "added",
+        "source": "research.pdf Demographics & Supply factors"
+      }
+    },
+    {
+      "id": "homebuilding",
+      "name": "Homebuilding / new-home construction",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": 8.2
+      },
+      "provenance": "notes",
+      "source": "research.pdf + SEED DATA /10 ranking",
+      "drivers": [
+        "Mortgage affordability",
+        "Land & construction costs",
+        "Operating leverage on margins"
+      ],
+      "description": "Companies that build new homes. Very rate-sensitive: buyers need affordable mortgages, and builders need affordable financing. See the research's example of how a 5% price cut can wipe out 50% of a builder's profit (p.5).",
+      "rateWhy": {
+        "text": "Builders are squeezed from both sides. Buyers' mortgage payments jump (a EUR320k loan costs EUR1,349/month at 3% but EUR2,129 at 7%, about 58% more), so fewer can buy. At the same time land and construction financing gets more expensive. Operating leverage then amplifies it: a 5% price cut can wipe out 50% of profit.",
+        "provenance": "added",
+        "source": "research.pdf p.5 (Homebuilder mechanics)"
+      }
+    },
+    {
+      "id": "property_developers",
+      "name": "Property developers (non-residential)",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": 9.0
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "Development spread (yield-on-cost vs cap rate)",
+        "Construction financing",
+        "Land costs"
+      ],
+      "description": "Companies that build offices, retail, and other non-residential property. Their profit margin is the first thing to disappear when rates and costs rise together (p.14-15), which is why they score near the top here.",
+      "rateWhy": {
+        "text": "A developer only builds when the yield on cost is clearly above the market cap rate. Rising rates push cap rates up and financing costs up at the same time, so that spread disappears. Projects take years, earn nothing until finished, and are usually funded with floating-rate construction loans. That combination is why development scores 9.0/10.",
+        "provenance": "added",
+        "source": "research.pdf p.14-15 (development spread)"
+      }
+    },
+    {
+      "id": "highly_leveraged_distressed_reits",
+      "name": "Highly leveraged / distressed REITs",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "Very High",
+        "score10": 10
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "Refinancing wall",
+        "DSCR covenant breaches",
+        "Forced sales"
+      ],
+      "description": "The highest rate-impact score here (10/10) -- too much debt makes a company very sensitive to rate changes. On the flip side, data shows funds that buy distressed, over-leveraged property have historically earned the best returns with the smallest losses (p.26-27).",
+      "rateWhy": {
+        "text": "Debt magnifies every move in property values. With EUR1b of assets and EUR400m of debt, a 10% fall in property value cuts NAV by 16.7%, and the more debt there is, the bigger that multiplier gets. When loans come due, lenders offer less (lower LTV) at higher rates, which can force equity raises or asset sales at the worst moment.",
+        "provenance": "added",
+        "source": "research.pdf p.5 (leverage amplification), p.20-22 (refinancing)"
+      }
+    },
+    {
+      "id": "logistics_industrial_reits",
+      "name": "Logistics / Industrial REITs",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "Med-High",
+        "score10": 5.8
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "E-commerce demand",
+        "Development pipeline",
+        "Long leases vs floating financing"
+      ],
+      "description": "The listed-company version of the Industrial/Logistics sector above.",
+      "rateWhy": {
+        "text": "The listed version carries the property-level exposure plus one more channel: REIT shares compete with government bonds for income investors, so share prices fall when bond yields rise. Leases are long with fixed annual increases, while debt reprices when it is refinanced, so costs can outrun rents for a while.",
+        "provenance": "added",
+        "source": "research.pdf p.5 (competing yields)"
+      }
+    },
+    {
+      "id": "retail_shopping_centre_reits",
+      "name": "Retail / Shopping-Centre REITs",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "Med-High",
+        "score10": 6.6
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "Consumer spending",
+        "Occupancy cost ratios",
+        "Refinancing"
+      ],
+      "description": "The listed-company version of the Retail sector above.",
+      "rateWhy": {
+        "text": "Shopping-centre REITs pay high dividend yields, which gives some cushion against bonds. But the large ones are heavily indebted (URW's net debt is about 9x annual earnings), so each refinancing at higher rates cuts cash flow and pressures NAV.",
+        "provenance": "added",
+        "source": "research.pdf p.5; URW H1 2026 results"
+      }
+    },
+    {
+      "id": "office_reits",
+      "name": "Office REITs",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": 7.5
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "Hybrid work",
+        "Credit availability (lenders avoid office most)",
+        "Refinancing wall"
+      ],
+      "description": "The listed-company version of the Office sector above -- also the one the Credit factor's notes flag as hit hardest by tight lending.",
+      "rateWhy": {
+        "text": "Office REITs take on all of office property's problems (falling values, weak demand, lenders avoiding the sector) plus the listed-market effect: their dividend yield has to compete with bond yields, so share prices react immediately when rates move.",
+        "provenance": "added",
+        "source": "research.pdf p.5, p.20-22"
+      }
+    },
+    {
+      "id": "construction_infra",
+      "name": "Construction & infrastructure (contractors/engineers)",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "Low",
+        "score10": 2.8
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "Public/private capex pipeline",
+        "Materials & labour costs"
+      ],
+      "description": "Contractors and civil engineers. They provide a service rather than own property, so rates affect them less directly.",
+      "rateWhy": {
+        "text": "Contractors and engineers earn fees on contracts. They do not own the buildings or carry the property debt, so rates reach them only indirectly. Fewer new private projects get approved when financing is expensive, but that shows up with a delay, and government infrastructure work cushions the drop.",
+        "provenance": "added",
+        "source": "SEED DATA /10 ranking"
+      }
+    },
+    {
+      "id": "property_mgmt_services",
+      "name": "Property management & services",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "Very Low",
+        "score10": 1.8
+      },
+      "provenance": "notes",
+      "source": "SEED DATA /10 ranking",
+      "drivers": [
+        "Fee income on assets under management",
+        "Transaction volumes"
+      ],
+      "description": "Brokerage, leasing, and property management businesses. They earn fees rather than own buildings or debt, which makes them the least rate-sensitive business here.",
+      "rateWhy": {
+        "text": "These businesses earn fees for managing and leasing buildings other people own. They carry no property and little debt, which is why they score lowest (1.8/10). Brokerage fees do fall when high rates freeze transactions, but management and leasing fees keep coming in.",
+        "provenance": "added",
+        "source": "SEED DATA /10 ranking"
+      }
+    },
+    {
+      "id": "home_improvement_retail",
+      "name": "Home improvement retail & building products",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Confidence & Construction Costs factors)",
+      "drivers": [
+        "Renovation spending",
+        "Consumer confidence",
+        "Existing-home turnover"
+      ],
+      "description": "Home renovation and DIY stores, plus their suppliers.",
+      "rateWhy": {
+        "text": "Renovation spending peaks when people move house, and high rates freeze moving (lock-in). Some owners who stay put renovate instead, which partly offsets this. In Europe, energy-efficiency rules (EPBD) add retrofit demand that does not depend on rates.",
+        "provenance": "added",
+        "source": "research.pdf p.9 (Confidence), p.17 (lock-in), p.19 (energy rules)"
+      }
+    },
+    {
+      "id": "existing_home_market",
+      "name": "Existing-home market (resale)",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Supply & lock-in factor, p.16-17)",
+      "drivers": [
+        "Mortgage lock-in effect",
+        "Months of supply",
+        "Seller/buyer balance"
+      ],
+      "description": "People selling their existing homes. This is the segment most affected by the mortgage lock-in effect described on p.17 (owners not wanting to give up a cheap old mortgage rate).",
+      "rateWhy": {
+        "text": "This is where the lock-in effect bites. Owners with cheap fixed-rate mortgages will not sell and take on a new loan at today's rates, so listings and sales volumes collapse even while prices hold up. Europe's lock-in is weaker because most mortgages are variable or fixed for only 5-10 years.",
+        "provenance": "added",
+        "source": "research.pdf p.17 (lock-in effect)"
+      }
+    },
+    {
+      "id": "building_products",
+      "name": "Building products manufacturers",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Construction Costs & Policy factors, p.14, p.18)",
+      "drivers": [
+        "New-build volumes",
+        "Renovation spending",
+        "Tariffs & subsidies"
+      ],
+      "description": "Insulation, HVAC, windows, elevators, electrical equipment manufacturers -- upstream of Construction in the vertical chain.",
+      "rateWhy": {
+        "text": "Demand follows the number of homes and buildings being built or renovated. Rates reach it with a delay: higher rates cut housing starts, and product orders follow months later. Renovation demand driven by regulation offsets part of the drop.",
+        "provenance": "added",
+        "source": "research.pdf p.14, p.18"
+      }
+    },
+    {
+      "id": "wood_lumber",
+      "name": "Wood & lumber",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "High (volatility)",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Construction Costs factor, p.15)",
+      "drivers": [
+        "Homebuilding starts",
+        "Commodity supply shocks"
+      ],
+      "description": "Raw-materials input. Notes flag lumber can swing sixfold in a year then collapse 70% -- the most volatile single cost line for builders.",
+      "rateWhy": {
+        "text": "Lumber demand is concentrated in new homebuilding, and housing starts are among the most rate-sensitive numbers in the economy, so lumber prices swing with rates. Supply shocks then add volatility of their own: prices can rise sixfold in a year and then collapse 70%.",
+        "provenance": "added",
+        "source": "research.pdf p.15 (Construction Costs factor)"
+      }
+    },
+    {
+      "id": "reits_general",
+      "name": "REITs -- tax regime exposure",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "Medium",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Policy factor, p.18)",
+      "drivers": [
+        "REIT tax status rules",
+        "Dividend distribution requirements"
+      ],
+      "description": "Cross-cutting: all listed REITs are exposed to changes in REIT tax regimes, named separately from individual property types under Policy.",
+      "rateWhy": {
+        "text": "REITs must pay out most of their income as dividends, so they cannot retain cash and have to borrow or issue shares to grow. Both get more expensive when rates rise. Investors also treat REITs partly as income instruments, so their prices move against bond yields.",
+        "provenance": "added",
+        "source": "research.pdf p.5, p.18 (tax regimes)"
+      }
+    },
+    {
+      "id": "leveraged_reits",
+      "name": "Leveraged REITs (general)",
+      "category": "business-model",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Credit factor, p.20)",
+      "drivers": [
+        "Loan-to-value",
+        "Refinancing spreads",
+        "Lender covenants"
+      ],
+      "description": "Credit-factor-specific cut: REITs with high leverage regardless of property type, most exposed to tightening credit.",
+      "rateWhy": {
+        "text": "As debt is refinanced, interest expense rises and less cash is left for shareholders. Lenders also cut how much they will lend against the same building, so refinancing can require fresh equity, often raised at a discount to NAV. Leverage then magnifies every move in property values.",
+        "provenance": "added",
+        "source": "research.pdf p.5, p.20-22 (lender's levers)"
+      }
+    },
+    {
+      "id": "multifamily_buyers",
+      "name": "Multifamily buyers (institutional)",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Credit factor, p.20)",
+      "drivers": [
+        "Agency/bank lending availability",
+        "Cap rate vs financing cost spread"
+      ],
+      "description": "Institutional buyers of apartment assets -- named by Credit as directly hit by lending conditions.",
+      "rateWhy": {
+        "text": "Institutional buyers borrow to buy, and a deal only works when the property's cap rate is above the borrowing cost (positive leverage). When mortgage rates rise above cap rates, deals stop adding up, so transaction volumes fall until prices drop enough to restore the spread.",
+        "provenance": "added",
+        "source": "research.pdf p.20 (Credit factor)"
+      }
+    },
+    {
+      "id": "homebuyers",
+      "name": "Individual homebuyers (mortgage-dependent)",
+      "category": "sub-sector",
+      "rateSensitivity": {
+        "qualitative": "High",
+        "score10": null
+      },
+      "provenance": "notes",
+      "source": "research.pdf (Credit factor, p.20)",
+      "drivers": [
+        "Mortgage approval rates",
+        "Spread over policy rate",
+        "Down-payment / savings rate"
+      ],
+      "description": "Owner-occupier demand side -- named by Credit distinctly from the Existing-Home Market supply side.",
+      "rateWhy": {
+        "text": "A household's monthly payment depends directly on the mortgage rate: going from 3% to 7% raises the payment on the same loan by about 58%. Banks also test affordability at the higher rate, so the amount they will lend shrinks. A thin savings rate makes the deposit a second barrier.",
+        "provenance": "added",
+        "source": "research.pdf p.5 (mortgage affordability), p.9 (savings-deposit problem)"
+      }
+    }
+  ]
+}

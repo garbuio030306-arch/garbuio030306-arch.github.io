@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Rate-Sensitivity Map</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div id="app">
+
+  <header class="topbar">
+    <h1>Real Estate Rate-Sensitivity Map</h1>
+    <span class="subtitle">European real estate research</span>
+    <div class="spacer"></div>
+    <label class="chip-toggle"><input type="checkbox" id="filter-hide-added"> Hide "added"</label>
+    <label class="chip-toggle"><input type="checkbox" id="filter-hide-proposed"> Hide "proposed"</label>
+    <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">🌙 Dark</button>
+    <button class="icon-btn" id="help-btn" aria-label="How to read this map">? Help</button>
+  </header>
+
+  <nav class="tabs" aria-label="Views">
+    <button class="tab active" data-view="fullpicture">Full Picture</button>
+    <button class="tab" data-view="scenario">Scenario Explorer</button>
+    <button class="tab" data-view="chain">Vertical Value Chain</button>
+    <button class="tab" data-view="network">Interconnection Network</button>
+    <button class="tab" data-view="heatmap">Factor × Segment Heatmap</button>
+  </nav>
+
+  <div id="loading-banner" style="padding:10px 16px;font-size:13px;color:var(--text-muted);">Loading data…</div>
+
+  <main id="main-content">
+    <section id="view-fullpicture" class="view"></section>
+    <section id="view-scenario" class="view" hidden></section>
+    <section id="view-chain" class="view" hidden></section>
+    <section id="view-network" class="view" hidden></section>
+    <section id="view-heatmap" class="view" hidden></section>
+  </main>
+
+  <div class="detail-panel" id="detail-panel" aria-hidden="true">
+    <div id="detail-panel-body"></div>
+  </div>
+  <div id="detail-panel-close-outer" style="display:none;"></div>
+
+  <div class="overlay-backdrop" id="help-overlay" hidden>
+    <div class="help-modal" role="dialog" aria-label="How to read this map">
+      <button class="close-btn" id="help-close" aria-label="Close" style="float:right;background:none;border:none;font-size:20px;cursor:pointer;">&times;</button>
+      <h2>How to read this map</h2>
+      <p>This site has 5 pages, or "views". Each one looks at the same research a different way.</p>
+      <ul>
+        <li><b>Full Picture</b> — the research drawn as a house. Click a room to walk in and see what's inside, then click any item to read it. Use the search bar to jump straight to anything.</li>
+        <li><b>Scenario Explorer</b> — pick a factor and a "what if" to see what happens.</li>
+        <li><b>Vertical Value Chain</b> — how a building gets made and owned, step by step.</li>
+        <li><b>Interconnection Network</b> — a map of which factors affect which others. Scroll or pinch to zoom.</li>
+        <li><b>Factor × Segment Heatmap</b> — a grid showing which factors affect which parts of real estate.</li>
+      </ul>
+      <p><b>Colours:</b> <span class="prov-badge notes">notes</span> = from your research PDF, <span class="prov-badge added">added</span> = we looked it up and cited a source, <span class="prov-badge proposed">proposed</span> = our guess, for you to check. Use the "Hide added/proposed" switches at the top to see notes only.</p>
+      <p><b>Keyboard:</b> Tab to move between controls, Enter or Space to select, Escape to close.</p>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/vendor/d3.v7.min.js"></script>
+<script src="js/graph-metrics.js"></script>
+<script src="js/data-loader.js"></script>
+<script src="js/detail-panel.js"></script>
+<script src="js/about-view.js"></script>
+<script src="js/view-fullpicture.js"></script>
+<script src="js/view-chain.js"></script>
+<script src="js/view-network.js"></script>
+<script src="js/view-heatmap.js"></script>
+<script src="js/view-scenario.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

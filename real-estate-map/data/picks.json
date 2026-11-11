@@ -1,0 +1,119 @@
+{
+  "_comment": "The original picks table (p.1-2) had one header row but mismatched columns -- row position didn't mean the items in that row were related. Split here into 3 separate lists: stocks, funds, and ETFs. This is research organisation, not investment advice -- no price targets, no buy/sell calls.",
+  "stocks": [
+    {
+      "id": "urw",
+      "name": "Unibail-Rodamco-Westfield SE",
+      "aka": "WFD Unibail-Rodamco N.V. (unsponsored ADR)",
+      "ticker": "URMCY",
+      "provenance": "notes",
+      "source": "research.pdf p.1",
+      "flag": "The ticker URMCY is the US line; the main listing trades in Paris/Amsterdam under a different ticker (URW). Worth double-checking.",
+      "fundamentals": {
+        "business": "Owns and runs large shopping centres across Europe (the Westfield brand plus others) -- one of the biggest listed retail landlords in Europe.",
+        "leverageLTV": "Debt is 41.9% of property value (H1 2026), down slightly from year-end 2025. Company's own target: 40% by 2028.",
+        "debtMaturityProfile": "Average debt term: 6.7 years. Net debt: EUR20.1bn (down from EUR20.3bn). Debt is 9.1x annual earnings (down from 9.2x), targeting 8.0x by 2028. Raised EUR2.1bn in new financing in H1 2026. Average interest cost on debt rose slightly to 2.3%.",
+        "discountToNAV": "No single confirmed number for this company specifically. The sector-wide average was 26.8% below asset value in late 2025, and some sources suggest it widened toward 40%+ by mid-2026 -- but that's not confirmed for this company.",
+        "keyRisk": "Debt is still high (9x earnings), so its asset value is very sensitive to further rate moves. Also some execution risk on its 2028 debt-reduction plan.",
+        "provenance": "added",
+        "source": "URW H1 2026 results press release and earnings call, 30 Jul 2026 (urw.com/investors; investing.com earnings transcript)",
+        "sourceDate": "2026-07-30",
+        "note": "Research organisation only -- not investment advice, no price targets or recommendations."
+      }
+    },
+    {
+      "id": "gecina",
+      "name": "Gecina SA",
+      "ticker": "GFC",
+      "provenance": "notes",
+      "source": "research.pdf p.1",
+      "fundamentals": {
+        "business": "French landlord focused on prime Paris offices and homes.",
+        "leverageLTV": "Debt is 38.5% of property value (30 June 2026) -- conservative compared to peers.",
+        "debtMaturityProfile": "Net debt: EUR6.7bn. Average debt term: 6.2 years, with enough cash to cover all bond repayments until 2029. Average interest cost on debt: just 1.6%. Credit ratings have stayed top-tier for 8 years running.",
+        "discountToNAV": "Its per-share asset value (EPRA NTA) fell to EUR141.0 (from EUR144.1) as of June 2026. One outside estimate puts the discount to asset value at around 47%, but that figure comes from a single source we couldn't independently confirm.",
+        "keyRisk": "Heavily exposed to Paris offices, a part of the market that reacts slowly to the cycle. Paris office leasing was slow in H1 2026, even though this company's own buildings did better than that average.",
+        "provenance": "added",
+        "source": "Gecina H1 2026 earnings press release, 22 Jul 2026 (gecina.fr/investors/financing; Morningstar/Businesswire republication)",
+        "sourceDate": "2026-07-22",
+        "note": "Research organisation only -- not investment advice, no price targets or recommendations."
+      }
+    }
+  ],
+  "funds": [
+    {
+      "id": "infravia_v",
+      "name": "Infravia European Fund V",
+      "fundManager": "",
+      "provenance": "notes",
+      "source": "research.pdf p.1",
+      "flag": "No manager named in the notes. It's probably Infravia Capital Partners (same name), but that's not confirmed."
+    },
+    {
+      "id": "niam_vi",
+      "name": "Niam Nordic Fund VI",
+      "fundManager": "Niam (guessed from the fund's name, not stated in the notes)",
+      "fundManagerProvenance": "proposed",
+      "provenance": "notes",
+      "source": "research.pdf p.1"
+    },
+    {
+      "id": "orion_iii",
+      "name": "Orion European Real Estate Fund III",
+      "fundManager": "Orion Capital Managers",
+      "provenance": "notes",
+      "source": "research.pdf p.1"
+    },
+    {
+      "id": "east_capital_explorer",
+      "name": "East Capital Explorer",
+      "fundManager": "Eastnine",
+      "provenance": "notes",
+      "source": "research.pdf p.1",
+      "flag": "Confirmed: these are the same company, not a fund and its manager. East Capital Explorer renamed itself Eastnine in 2017. It's a Swedish company that owns offices in the Baltic capitals.",
+      "flagProvenance": "added",
+      "flagSource": "Cision press release / GlobeNewswire, 'East Capital Explorer AB (publ) changes name to Eastnine AB (publ)'",
+      "flagSourceDate": "2017-06-01"
+    },
+    {
+      "id": "alt_property_income",
+      "name": "Alternative Property Income Venture",
+      "fundManager": "AXA IM Alts",
+      "provenance": "notes",
+      "source": "research.pdf p.1"
+    },
+    {
+      "id": "icg_mezz_iii",
+      "name": "ICG Mezzanine Fund III",
+      "fundManager": "ICG (Intercontinental/Intermediate Capital Group)",
+      "provenance": "notes",
+      "source": "research.pdf p.1"
+    },
+    {
+      "id": "aermont",
+      "name": "Aermont Capital Real Estate Fund",
+      "fundManager": "",
+      "provenance": "notes",
+      "source": "research.pdf p.1",
+      "flag": "You highlighted this one yellow in your own notes -- looks like your own reminder to double-check it, so we kept that flag."
+    },
+    {
+      "id": "nrep_v",
+      "name": "NREP Nordic Strategies Fund V",
+      "fundManager": "NREP (guessed from the fund's name, not stated in the notes)",
+      "fundManagerProvenance": "proposed",
+      "provenance": "notes",
+      "source": "research.pdf p.1"
+    }
+  ],
+  "etfs": [
+    {
+      "id": "glix",
+      "name": "GLIX",
+      "fullName": "Lazard Listed Infrastructure",
+      "provenance": "notes",
+      "source": "research.pdf p.1",
+      "flag": "This was in the same row as URW in the original table, but that's just layout -- it's not connected to URW."
+    }
+  ]
+}

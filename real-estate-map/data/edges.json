@@ -1,0 +1,69 @@
+{
+  "_comment": "Directed edges = 'Links to other factors' from research.pdf. provenance: notes=from PDF, proposed=Claude-suggested (Rates & Inflation had no outbound links in the notes; Inflation's notes section was a verbatim duplicate of Consumer Confidence and is NOT used here per spec). Edit this file and every ranking/network/heatmap view recomputes.",
+  "edges": [
+    { "id": "e1",  "source": "labour",   "target": "rates",       "provenance": "notes", "page": 6 },
+    { "id": "e2",  "source": "labour",   "target": "confidence",  "provenance": "notes", "page": 6 },
+    { "id": "e3",  "source": "labour",   "target": "credit",      "provenance": "notes", "page": 6 },
+    { "id": "e4",  "source": "labour",   "target": "demographics","provenance": "notes", "page": 6 },
+    { "id": "e5",  "source": "labour",   "target": "gdp",         "provenance": "notes", "page": 6 },
+
+    { "id": "e6",  "source": "confidence","target": "labour",     "provenance": "notes", "page": 9 },
+    { "id": "e7",  "source": "confidence","target": "inflation",  "provenance": "notes", "page": 9 },
+    { "id": "e8",  "source": "confidence","target": "credit",     "provenance": "notes", "page": 9 },
+    { "id": "e9",  "source": "confidence","target": "supply",     "provenance": "notes", "page": 9 },
+    { "id": "e10", "source": "confidence","target": "gdp",        "provenance": "notes", "page": 9 },
+
+    { "id": "e11", "source": "demographics","target": "labour",     "provenance": "notes", "page": 12 },
+    { "id": "e12", "source": "demographics","target": "credit",     "provenance": "notes", "page": 12 },
+    { "id": "e13", "source": "demographics","target": "supply",     "provenance": "notes", "page": 12 },
+    { "id": "e14", "source": "demographics","target": "policy",     "provenance": "notes", "page": 12 },
+    { "id": "e15", "source": "demographics","target": "rates",      "provenance": "notes", "page": 12 },
+
+    { "id": "e16", "source": "construction_costs","target": "inflation",  "provenance": "notes", "page": 14 },
+    { "id": "e17", "source": "construction_costs","target": "labour",     "provenance": "notes", "page": 14 },
+    { "id": "e18", "source": "construction_costs","target": "supply",     "provenance": "notes", "page": 14 },
+    { "id": "e19", "source": "construction_costs","target": "credit",     "provenance": "notes", "page": 14 },
+    { "id": "e20", "source": "construction_costs","target": "policy",     "provenance": "notes", "page": 14 },
+    { "id": "e21", "source": "construction_costs","target": "confidence","provenance": "notes", "page": 14 },
+
+    { "id": "e22", "source": "supply","target": "rates",       "provenance": "notes", "page": 17 },
+    { "id": "e23", "source": "supply","target": "construction_costs","provenance": "notes", "page": 17 },
+    { "id": "e24", "source": "supply","target": "confidence",  "provenance": "notes", "page": 17 },
+    { "id": "e25", "source": "supply","target": "credit",      "provenance": "notes", "page": 17 },
+    { "id": "e26", "source": "supply","target": "policy",      "provenance": "notes", "page": 17 },
+    { "id": "e27", "source": "supply","target": "demographics","provenance": "notes", "page": 17 },
+
+    { "id": "e28", "source": "policy","target": "supply",       "provenance": "notes", "page": 19 },
+    { "id": "e29", "source": "policy","target": "construction_costs","provenance": "notes", "page": 19 },
+    { "id": "e30", "source": "policy","target": "demographics", "provenance": "notes", "page": 19 },
+    { "id": "e31", "source": "policy","target": "inflation",    "provenance": "notes", "page": 19 },
+    { "id": "e32", "source": "policy","target": "gdp",          "provenance": "notes", "page": 19 },
+
+    { "id": "e33", "source": "credit","target": "rates",      "provenance": "notes", "page": 21 },
+    { "id": "e34", "source": "credit","target": "inflation",  "provenance": "notes", "page": 21 },
+    { "id": "e35", "source": "credit","target": "confidence", "provenance": "notes", "page": 21 },
+    { "id": "e36", "source": "credit","target": "supply",     "provenance": "notes", "page": 21 },
+    { "id": "e37", "source": "credit","target": "policy",     "provenance": "notes", "page": 21 },
+    { "id": "e38", "source": "credit","target": "gdp",        "provenance": "notes", "page": 21 },
+
+    { "id": "e39", "source": "gdp","target": "labour",      "provenance": "notes", "page": 23 },
+    { "id": "e40", "source": "gdp","target": "confidence",  "provenance": "notes", "page": 23 },
+    { "id": "e41", "source": "gdp","target": "inflation",   "provenance": "notes", "page": 23 },
+    { "id": "e42", "source": "gdp","target": "rates",       "provenance": "notes", "page": 23 },
+    { "id": "e43", "source": "gdp","target": "credit",      "provenance": "notes", "page": 23 },
+    { "id": "e44", "source": "gdp","target": "supply",      "provenance": "notes", "page": 23 },
+    { "id": "e45", "source": "gdp","target": "policy",      "provenance": "notes", "page": 23 },
+
+    { "id": "p1", "source": "rates", "target": "credit",      "provenance": "proposed", "rationale": "Policy rate sets the base cost of debt that lenders price loans off.", "addedDate": "2026-10-22" },
+    { "id": "p2", "source": "rates", "target": "construction_costs", "provenance": "proposed", "rationale": "Rates set financing cost for land, construction loans and development spreads.", "addedDate": "2026-10-22" },
+    { "id": "p3", "source": "rates", "target": "supply",      "provenance": "proposed", "rationale": "Rate level creates/releases the existing-home mortgage lock-in effect.", "addedDate": "2026-10-22" },
+    { "id": "p4", "source": "rates", "target": "confidence",  "provenance": "proposed", "rationale": "Mortgage affordability and discount-rate effects on wealth feed directly into household confidence.", "addedDate": "2026-10-22" },
+    { "id": "p5", "source": "rates", "target": "gdp",         "provenance": "proposed", "rationale": "Standard monetary-policy transmission channel: rates affect investment and consumption, hence growth.", "addedDate": "2026-10-22" },
+
+    { "id": "p6", "source": "inflation", "target": "rates",      "provenance": "proposed", "rationale": "Central bank reaction function: inflation (vs target) is a primary driver of the policy rate path.", "addedDate": "2026-10-22" },
+    { "id": "p7", "source": "inflation", "target": "construction_costs", "provenance": "proposed", "rationale": "Energy and materials inflation feed directly into build costs.", "addedDate": "2026-10-22" },
+    { "id": "p8", "source": "inflation", "target": "confidence", "provenance": "proposed", "rationale": "Inflation erodes real incomes and savings buffers, denting sentiment.", "addedDate": "2026-10-22" },
+    { "id": "p9", "source": "inflation", "target": "credit",     "provenance": "proposed", "rationale": "Inflation drives the nominal policy rate which sets the base cost of credit.", "addedDate": "2026-10-22" },
+    { "id": "p10","source": "inflation", "target": "labour",     "provenance": "proposed", "rationale": "Wage-price dynamics: inflation feeds into wage demands and real-wage outcomes.", "addedDate": "2026-10-22" }
+  ]
+}

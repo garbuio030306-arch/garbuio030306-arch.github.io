@@ -1,0 +1,412 @@
+{
+  "_comment": "Full detail cards for the 10 macro factors. 'Links to other factors' live in edges.json (single source of truth for the graph) -- the Network/Scenario views resolve a factor's links from there. currentSituation cells marked provenance:'notes-empty' were blank in the PDF; 'added' cells were filled via web search (see source+date). Every numeric example is transcribed verbatim from research.pdf, not summarised.",
+  "factors": [
+    {
+      "id": "labour",
+      "name": "Labour Market and Incomes",
+      "provenance": "notes",
+      "sourcePages": [6, 7, 8],
+      "segmentsHit": ["homebuilding", "residential", "retail", "office", "hospitality"],
+      "segmentsHitRaw": "Homebuilding (affordability); Residential Rental (rent-to-income); Retail (spending power); Office (white-collar jobs); Hotels (discretionary travel)",
+      "whyItMatters": "Rents and mortgages are paid from people's income. Without income growth, higher rents and prices have nothing to stand on.",
+      "direction": {
+        "up": "Rising real wages + low unemployment. Employment growing + pay rising faster than inflation (positive real wages).",
+        "down": "Rising unemployment + very strong jobs data can HURT (keeps central banks from cutting)."
+      },
+      "backdrop": "Recession with layoffs (rising unemployment). Very bad combination: tight labour plus sticky inflation.",
+      "example": "REAL WAGES MUST BE RISING: A family earns 100 and buys a home for 100. Five years later the home costs 150 but the family earns only 120. They now need a much bigger share of pay to own the same home, so fewer families can buy.",
+      "watchouts": [
+        { "title": "#1 AFFORDABILITY", "detail": "Depends on three things: Home Price, Mortgage Rate, Household Income. Common test: housing costs above 30% of income is unaffordable. Report says prices would need to fall about 38% for homes to be cheaper than renting now, at mortgage rates of 6.7%." },
+        { "title": "#2 LABOUR TRENDS", "detail": "Office follows white-collar jobs. Logistics follows consumer spending and goods trade. Retail follows real disposable income. Hotels follow discretionary spending, the first thing cut when jobs get uncertain." },
+        { "title": "#3 GOOD-NEWS-IS-BAD-NEWS", "detail": "Strong jobs -> strong wages -> sticky inflation -> central bank cuts slower." }
+      ],
+      "indicators": {
+        "list": ["Wage growth vs house-price growth", "Unemployment", "Job openings"],
+        "sources": "FRED and BLS (US); Eurostat and the ECB wage tracker (Europe); Passport for household income by country."
+      },
+      "scenarios": [
+        { "scenario": "Employment rises (unemployment low or falling)", "whatHappens": "More households can pay rent and mortgages; firms need more space", "helped": "Rental, homebuilding, office, retail, hotels", "hurt": "Rate-sensitive REITs, if strong jobs keep inflation sticky and delay cuts", "netRead": "Good for demand, bad for timing if cuts get delayed" },
+        { "scenario": "Employment falls (layoffs, rising unemployment)", "whatHappens": "Fewer buyers and tenants; more missed payments; empty desks", "helped": "Rate cuts eventually, since a weak economy lowers rates", "hurt": "Office, hotels, retail, rental in the affected city, homebuilders", "netRead": "Cuts come, but demand weakens first, so bearish near term" },
+        { "scenario": "Incomes rise (real wages up)", "whatHappens": "Affordability improves without prices having to fall; rents are easier to pay", "helped": "Homebuilding, rental, retail, home improvement", "hurt": "Possibly rates, if wage growth feeds inflation", "netRead": "Best when inflation is also falling" },
+        { "scenario": "Incomes fall (real wages shrink)", "whatHappens": "Housing takes a bigger share of pay; more arrears; people double up", "helped": "Cheaper housing and renting over buying", "hurt": "Homebuilding, rental collections, retail, entry-level homes", "netRead": "Bearish, even if rates fall" }
+      ],
+      "additionalNotes": "Important (p.8): renting is cheaper than buying once the mortgage/rent ratio goes above 1.0. Page 8 also mentions a graph that isn't actually there.",
+      "currentSituation": {
+        "USA": [
+          { "indicator": "Unemployment", "situation": "4.2% in September 2026, up from 4.1% in August -- rising rather than falling.", "provenance": "added", "source": "US BLS, Employment Situation Summary, Sept 2026 (bls.gov/news.release/empsit.nr0.htm)", "sourceDate": "2026-10-02" },
+          { "indicator": "Job growth / wage growth", "situation": "Only 29,000 new jobs added in September 2026 -- well below expectations. Wage growth is slowing too. A cooling job market, but not a sharp downturn.", "provenance": "added", "source": "CNBC / US BLS jobs report", "sourceDate": "2026-10-02" }
+        ],
+        "EU": [
+          { "indicator": "Unemployment", "situation": "6.4% in August 2026 (euro area, seasonally adjusted), holding at that level since February 2026 -- stable, not deteriorating.", "provenance": "added", "source": "Eurostat euro-indicators", "sourceDate": "2026-09-01" },
+          { "indicator": "Growth backdrop", "situation": "The economy is actually doing well: a business activity index (PMI) hit a 41-month high in September 2026. Combined with inflation picking back up (see the Inflation factor), that's exactly the 'good news keeps the ECB from cutting rates' problem described in watch-out #3 below.", "provenance": "added", "source": "S&P Global Eurozone Composite PMI, Sept 2026", "sourceDate": "2026-10-01" }
+        ]
+      }
+    },
+
+    {
+      "id": "confidence",
+      "name": "Consumer Confidence and Savings",
+      "provenance": "notes",
+      "sourcePages": [8, 9, 10],
+      "segmentsHit": ["homebuilding", "residential", "home_improvement_retail"],
+      "segmentsHitRaw": "Homebuilding (first to feel it); Residential Rental (renters who delay buying stay renters); Home Improvement Retail and Building Products (renovation spending)",
+      "whyItMatters": "Home is the biggest purchase most people make. They commit only when they trust the job and economic situation. Confidence also drives spending on furniture, renovations, and moving.",
+      "direction": {
+        "up": "Rising confidence + rebuilding savings rate. Lower expected inflation.",
+        "down": "Falling confidence + thin savings rate."
+      },
+      "backdrop": "Inflation, job worries or geopolitical shocks make households pessimistic.",
+      "example": "A couple is ready to buy. News says layoffs are coming and prices are falling. They decide to wait six months. Multiply by a million couples and home sales drop even though nobody lost a job yet.",
+      "watchouts": [
+        { "title": "#1 CONFIDENCE LEADS, SALES FOLLOW", "detail": "Confidence is always the early warning. If confidence rises while sales are still flat, the recovery may be starting." },
+        { "title": "#2 SAVINGS-DEPOSIT PROBLEM", "detail": "A buyer usually needs a deposit before buying a house (e.g. 20% down). A savings rate of ~3% means most households are saving very little. Even if they could afford the monthly payment, they cannot clear the upfront cash. This is why builders are offering more mortgage-rate buy-downs: 66% of builders offered incentives in September and 38% cut base prices." },
+        { "title": "#3 FEEDBACK LOOP", "detail": "Falling prices make people expect further falls, so they wait. Waiting lowers sales, pushing prices down more, repeating. Can also run upward. This is why changing mood can move housing markets more than numbers -- markets overshoot both ways." }
+      ],
+      "indicators": {
+        "list": ["Consumer sentiment", "Personal saving rate", "Home sales", "Mortgage applications", "Builder confidence (NAHB index)"],
+        "sources": "University of Michigan, BEA, NAHB (US); European Commission and GfK (Europe)."
+      },
+      "scenarios": [
+        { "scenario": "Confidence rises", "whatHappens": "Buyers return; builders order land and start homes; sales and renovation spending rise", "helped": "Homebuilding, existing-home sales, home retail, building products", "hurt": "Nobody directly; the risk is inventory flooding in as sellers list", "netRead": "Bullish, especially if it arrives before supply floods the market" },
+        { "scenario": "Confidence falls", "whatHappens": "Buyers wait; builders cut starts and offer incentives; margins fall", "helped": "Renting over home buying", "hurt": "Homebuilding, retail, building products, existing sales", "netRead": "Bearish; rate cuts may not bring buyers back quickly" },
+        { "scenario": "Savings rate rises", "whatHappens": "More deposits and bigger buffers; fewer defaults when shocks hit", "helped": "First-time buyers, mortgage quality, lenders", "hurt": "Retail and spending in the short run, as people save instead", "netRead": "Bullish for entry demand and credit quality" },
+        { "scenario": "Savings rate falls", "whatHappens": "Fewer deposits, thin buffers, more missed payments after shocks", "helped": "Short-run spending", "hurt": "Entry-level homebuilding, rental collections, first-time buyers", "netRead": "Bearish; the report shows about 3% saving against 7.3% in 2019" }
+      ],
+      "currentSituation": {
+        "USA": [
+          { "indicator": "Savings Rate", "situation": "The savings rate right now in the US is about 3%, against 7.3% in 2019. Households lack down payments.", "provenance": "notes" },
+          { "indicator": "Confidence", "situation": "Sentiment is weak because of inflation and geopolitics. People don't buy homes when they feel insecure, so confidence leads transactions.", "provenance": "notes" }
+        ],
+        "EU": [
+          { "indicator": "Real Wages / Inflation", "situation": "Headline HICP inflation accelerated to 3.8% in September 2026 (highest since Sept 2023), with core (ex-energy/food) inflation at 2.5% -- both rising for a third straight month, squeezing real incomes just as the ECB is holding rates at 2.50%.", "provenance": "added", "source": "Eurostat euro-indicators", "sourceDate": "2026-10-16" },
+          { "indicator": "Unemployment", "situation": "6.4% (Aug 2026), stable since February -- see Labour factor for the full picture.", "provenance": "added", "source": "Eurostat", "sourceDate": "2026-09-01" },
+          { "indicator": "Risks?", "situation": "A French government bond sell-off (10y OAT above 5% for the first time since 2002, amid a budget standoff and protests) is the clearest confidence/geopolitical risk in the data right now -- see Rates factor.", "provenance": "added", "source": "TradingEconomics / Yahoo Finance", "sourceDate": "2026-10-21" }
+        ]
+      }
+    },
+
+    {
+      "id": "inflation",
+      "name": "Inflation and Energy Prices",
+      "provenance": "notes",
+      "sourcePages": [10, 11],
+      "segmentsHit": ["residential", "office", "retail", "industrial_logistics", "hospitality", "healthcare", "data_centres", "towers", "student_housing", "senior_housing", "manufactured_home_communities", "homebuilding", "property_developers", "highly_leveraged_distressed_reits", "logistics_industrial_reits", "retail_shopping_centre_reits", "office_reits", "construction_infra", "property_mgmt_services", "home_improvement_retail", "existing_home_market", "building_products", "wood_lumber", "reits_general", "leveraged_reits", "multifamily_buyers", "homebuyers"],
+      "segmentsHitRaw": "The notes just say 'ALL OF THEM' with no detail. We listed every segment here, since energy costs, construction costs, and interest-rate expectations really do touch the whole real estate chain -- this makes that claim specific instead of vague.",
+      "whyItMatters": "Rewritten by us -- the notes here were a word-for-word copy of the Consumer Confidence section. Energy is a direct cost for running buildings (heating, cooling, power), for construction (fuel, materials like cement and steel), and for household budgets (competing with rent). Inflation more broadly: (1) drives how fast the central bank cuts or raises rates, (2) determines whether rents with built-in inflation increases actually keep up with real costs, and (3) explains the 'brown discount' -- older, energy-wasteful buildings sell for less as energy costs and efficiency rules bite (this connects to the Policy factor's energy-rules section).",
+      "direction": {
+        "up": "Energy prices rising; running and building costs climb; household budgets shrink; inflation rises.",
+        "down": "Energy prices falling; lower running costs and materials costs; household spending power rises."
+      },
+      "backdrop": "Our own addition, since the notes didn't have one for this factor: supply shocks (energy, commodities), a tight labour market pushing wages and prices up together, or an overheating economy.",
+      "example": "Our own example, since the notes didn't have one for this factor: say energy costs for running an office building jump 30%. An old, inefficient building with no inflation-linked lease absorbs that cost directly, cutting its profit. A newer, efficient building with a green lease passes more of the cost to tenants. That gap in outcomes is the 'brown discount' in practice.",
+      "watchouts": [
+        { "title": "Correction flagged, not silently fixed", "detail": "The thesis opener says 'Rates should be decreasing... Europe is experiencing deflation.' The line directly beneath it, sourced to Eurostat, says the opposite: 'inflation excluding energy is substantially lower than headline inflation, but Europe is not currently experiencing broad-based deflation.' Treat the Eurostat-sourced line as correct." }
+      ],
+      "indicators": {
+        "list": ["CPI and core CPI", "Inflation expectations", "Oil and gas prices", "Central bank statements"],
+        "sources": "BLS and Fed (US); Eurostat and ECB (Europe)."
+      },
+      "scenarios": [
+        { "scenario": "Inflation falls", "whatHappens": "Central banks can cut; real incomes recover; cost pressure eases", "helped": "Listed REITs, homebuilders, buyers, leveraged owners", "hurt": "Owners relying on inflation-linked rent rises (slower rent growth)", "netRead": "The core of your thesis" },
+        { "scenario": "Inflation rises", "whatHappens": "Rates stay high or rise; costs climb; real incomes fall", "helped": "Owners with indexed leases (towers, some logistics); hard-asset owners", "hurt": "REITs with fixed leases, builders, buyers, leveraged developers", "netRead": "Bearish for timing; cuts get pushed out" },
+        { "scenario": "Energy prices fall", "whatHappens": "Lower running costs and materials costs; household spending power rises", "helped": "Older buildings, cement/glass/brick users, households, Europe especially", "hurt": "Little direct harm; less urgency to retrofit", "netRead": "Bullish, and quiet but powerful for Europe" },
+        { "scenario": "Energy prices rise", "whatHappens": "Running and building costs climb; household budgets shrink; inflation rises", "helped": "Efficient new buildings (they cost less to run)", "hurt": "Older office and flats, builders, materials users, Europe more than US", "netRead": "Bearish; this is the current risk in the report" }
+      ],
+      "currentSituation": {
+        "USA": [
+          { "indicator": "CPI", "situation": "A cooling job market (unemployment up to 4.2%, weak hiring) is the main signal pointing toward rate cuts -- see the Labour factor for detail. We didn't independently verify the latest CPI number.", "provenance": "added", "source": "US BLS jobs report cross-reference", "sourceDate": "2026-10-02" }
+        ],
+        "EU": [
+          { "indicator": "HICP headline", "situation": "3.8% in September 2026 -- accelerated for a third consecutive month, the highest since September 2023 (up from 3.2% in August).", "provenance": "added", "source": "Eurostat euro-indicators", "sourceDate": "2026-10-16" },
+          { "indicator": "HICP core (ex-energy/food)", "situation": "2.5% in September 2026, up from 2.4%. Also rising, though still well below the headline number. This is the Eurostat fact that corrects the notes' deflation claim.", "provenance": "added", "source": "Eurostat euro-indicators", "sourceDate": "2026-10-16" },
+          { "indicator": "Policy reaction", "situation": "The ECB raised its deposit rate from 2.00% to 2.50% over the year to October 2026 -- i.e. rates have been rising, not falling, as inflation re-accelerated alongside resilient growth (composite PMI at a 41-month high). This is the opposite of the thesis's base case and is the single most important real-world update to flag.", "provenance": "added", "source": "ECB / multiple rate trackers (macroradar.io, euribor-rates.info)", "sourceDate": "2026-10-21" }
+        ]
+      }
+    },
+
+    {
+      "id": "demographics",
+      "name": "Demographics and Household Formation",
+      "provenance": "notes",
+      "sourcePages": [12, 13],
+      "segmentsHit": ["residential", "homebuilding", "senior_housing", "healthcare", "student_housing", "manufactured_home_communities"],
+      "segmentsHitRaw": "Residential rental (young and mobile households); Homebuilding (first-time buyers); Senior housing and healthcare (ageing); Student housing; Manufactured-home communities (retirees)",
+      "whyItMatters": "Every new household needs a home to rent or buy. Population growth, age mix, household size and migration decide how much housing is needed over years. This sets the trend and is SLOW.",
+      "direction": {
+        "up": "More households + a large young cohort entering their buying years (working years).",
+        "down": "Shrinking or ageing population hurts demand -- UNLESS household size is also falling (more homes needed per person)."
+      },
+      "backdrop": "When the large age group reaches the household-forming stage of life (mid-20s to 40s), this turns into purchases only when jobs and affordability allow -- otherwise young adults stay with parents or rent.",
+      "example": "A wave of people born in the same years turns 30. Many leave their parents' homes and look for a flat. If they cannot afford to buy, they rent, so rental demand rises first and buying demand shows up later.",
+      "watchouts": [
+        { "title": "#1 HOUSEHOLDS, NOT PEOPLE", "detail": "Japan is one of the clearest real-world examples of how demographic decline affects real estate -- but with a twist: Japan's population is shrinking while its number of households has continued to increase." },
+        { "title": "#2", "detail": "", "provenance": "notes-empty" },
+        { "title": "#3", "detail": "", "provenance": "notes-empty" }
+      ],
+      "indicators": {
+        "list": ["Household formation", "Homeownership rate by age", "Population and migration data"],
+        "sources": "US Census Bureau, NAR (US); Eurostat, national statistics offices, Passport (Europe)."
+      },
+      "scenarios": [
+        { "scenario": "Household formation rises (young adults move out, immigration up)", "whatHappens": "More homes needed; rents and sales demand rise", "helped": "Rental, homebuilding, building products, home retail", "hurt": "Nobody directly; the risk is supply not keeping up and prices rising out of reach", "netRead": "Bullish if supply and jobs allow it" },
+        { "scenario": "Household formation falls (young stay at home, emigration, low births)", "whatHappens": "Fewer homes needed; vacancy rises", "helped": "Nobody; some regions lose most", "hurt": "Rental, homebuilding, local retail, shrinking regions", "netRead": "Bearish; the report shows formation slowing to 1.1M" },
+        { "scenario": "Ownership rate rises (renters become buyers)", "whatHappens": "Fewer renters, more owners; rental demand slows", "helped": "Homebuilders, building products, home retail, mortgage lenders", "hurt": "Single-family and apartment landlords", "netRead": "Good for builders, mixed for rental REITs" },
+        { "scenario": "Ownership rate falls (more people rent)", "whatHappens": "More renters; ownership delayed", "helped": "Rental REITs, apartments, single-family rental", "hurt": "Homebuilders, home retail, building products", "netRead": "Good for rental REITs, bad for builders; the report shows 65.0%" }
+      ],
+      "currentSituation": {
+        "USA": [
+          { "indicator": "Household formation", "situation": "Notes cite formation slowing to 1.1M (source not independently re-verified this pass).", "provenance": "notes" }
+        ],
+        "EU": [
+          { "indicator": "Population", "situation": "Just under 452 million as of 1 January 2026.", "provenance": "added", "source": "Eurostat", "sourceDate": "2026-01-01" },
+          { "indicator": "Household formation rate", "situation": "Not found as a specific current figure in this research pass -- flagged as a genuine gap rather than estimated.", "provenance": "added", "source": "n/a -- not found", "sourceDate": "2026-10-22" }
+        ]
+      }
+    },
+
+    {
+      "id": "construction_costs",
+      "name": "Construction Costs, Materials and Labour",
+      "provenance": "notes",
+      "sourcePages": [14, 15, 16],
+      "segmentsHit": ["homebuilding", "building_products", "wood_lumber", "property_developers", "industrial_logistics", "residential", "home_improvement_retail"],
+      "segmentsHitRaw": "Homebuilding (margins); Building products; Wood and lumber; Developers and development REITs; Logistics and multifamily developers; Home improvement retail",
+      "whyItMatters": "Costs set the price at which new property makes sense to build. High costs reduce new supply, which can support values of existing buildings. They also squeeze builder margins and push new homes out of reach for buyers. This is why it matters that if costs increase, builders with a big backlog of buildings or large portfolio are better insulated.",
+      "direction": {
+        "up": "Stable, moderate costs help builders.",
+        "down": "Sharp rises hurt builders -- BUT are good for owners of existing buildings (new competition gets harder to build)."
+      },
+      "backdrop": "Strong construction demand and supply-chain disruption push costs up (2020-22). Tariffs, energy shocks and labour shortages can do the same. Cost falls come after demand cools or supply chains clear.",
+      "example": "A builder spends 80 to build a home and sells it for 100. If costs rise to 90 and buyers will not pay more than 100, profit drops from 20 to 10. The builder may stop building, so fewer homes arrive next year.",
+      "watchouts": [
+        { "title": "#1 SCALE WINS IN A SQUEEZE", "detail": "Public homebuilders (35-40% of the market) can absorb lower prices better than small builders because of scale and lower cost of capital. When costs rise, big builders squeeze suppliers and take share from small ones." },
+        { "title": "#2 VOLATILE MATERIALS, STICKY LABOUR", "detail": "Lumber can swing sixfold in a year, then collapse 70%. Labour costs rise slowly and do not fall. Materials make the cycle's spikes, while labour creates a steady rise that never reverses. Builders lock in suppliers and prefer to buy land with options rather than own it -- Lennar holds 98% of its lots through options or joint ventures." },
+        { "title": "#3 DEVELOPMENT SPREAD", "detail": "A developer builds only when the yield on cost (net income from the new building divided by what it cost to build) is clearly higher than the market cap rate (the yield buyers pay for a finished building). If costs and rates both rise, the spread vanishes and no one builds -- bearish for new supply, bullish for existing assets later." }
+      ],
+      "indicators": {
+        "list": ["PPI for residential construction goods", "Lumber futures", "Builder gross margin", "Construction employment and wages"],
+        "sources": "BLS and NAHB (US); Eurostat construction cost indices, national statistics, Passport (Europe)."
+      },
+      "scenarios": [
+        { "scenario": "Materials costs fall (lumber, steel, cement)", "whatHappens": "Builders' margins widen; new homes get cheaper", "helped": "Homebuilders, buyers, developers", "hurt": "Materials makers (lower prices); existing owners (more new supply later)", "netRead": "Good for builders, mixed for lumber and materials names" },
+        { "scenario": "Materials costs rise", "whatHappens": "Margins squeeze; builders cut starts or raise prices", "helped": "Materials makers, existing owners (less competition)", "hurt": "Homebuilders, buyers, developers", "netRead": "Bearish for builders now, supportive for existing assets later" },
+        { "scenario": "Labour costs ease (shortage eases)", "whatHappens": "Cheaper, faster building; development spread widens", "helped": "Developers, builders, home retail", "hurt": "Construction workers' pay", "netRead": "Mildly bullish for builders" },
+        { "scenario": "Labour costs rise (shortage worsens)", "whatHappens": "Higher build cost and slower delivery; projects get cancelled", "helped": "Existing owners, wage earners", "hurt": "Developers, builders, rental developers", "netRead": "Bearish for builders, quietly supportive for existing REITs" }
+      ],
+      "currentSituation": {
+        "USA": [
+          { "indicator": "Construction costs", "situation": "Construction cost inflation has been low single digit in 2024-25. Over 90% of the value of residential construction goods is made domestically.", "provenance": "notes" },
+          { "indicator": "Margins", "situation": "Builder gross margin fell from about 27% in 2022 to 20.3% in Q3 2026, and operating margin from about 20% to about 11%.", "provenance": "notes" }
+        ],
+        "EU": [
+          { "indicator": "Construction costs", "situation": "Building costs in the EU rose 1.7% in Q2 2026 alone, and the pace is picking up -- the opposite of the US trend above. Total rise since 2015: 48.2%.", "provenance": "added", "source": "Eurostat construction producer price index", "sourceDate": "2026-Q2" }
+        ]
+      }
+    },
+
+    {
+      "id": "supply",
+      "name": "Housing Supply and the Existing-Home Lock-in",
+      "provenance": "notes",
+      "sourcePages": [16, 17, 18],
+      "segmentsHit": ["existing_home_market", "homebuilding", "residential", "manufactured_home_communities"],
+      "segmentsHitRaw": "Existing-home market (new-home inventory); Homebuilding; Residential rental and multifamily developers (vacancy and absorption); Manufactured-home communities",
+      "whyItMatters": "Supply against demand sets prices, rents and vacancy. Too little supply pushes values up. Too much pushes values down and forces discounts. It is the balance, not the level, that matters.",
+      "direction": {
+        "up": "Balanced market (about 4-6 months of supply, vacancy near average).",
+        "down": "Too much inventory hurts prices and builders. Too little hurts transactions and keeps prices high."
+      },
+      "backdrop": "After a building boom or demand drop, supply outruns demand. The lock-in effect applies when many owners hold cheap old mortgages and rates are much higher today; it fades as time passes or as rates fall.",
+      "example": "A town has 100 homes for sale and 100 buyers a month, so supply lasts one month and prices rise. If sales halve to 50 buyers a month, the same 100 homes last two months and sellers start cutting prices.",
+      "watchouts": [
+        { "title": "LOCK-IN EFFECT (mechanism)", "detail": "You bought a house in 2021 with a 2% fixed mortgage. Today, new mortgages cost 6%. You want to move to a bigger house, but doing so means giving up your cheap 2% mortgage and taking out a new loan at 6%. So you decide not to sell. Millions of homeowners making the same decision creates the lock-in effect." },
+        { "title": "#1 SELLERS OUTNUMBER BUYERS SHIFT", "detail": "Sellers now outnumber buyers by the most in a decade -- a buyer's market. This often precedes falling prices. Morningstar expects existing-home prices to come under additional pressure in 2027 as inventory normalises." },
+        { "title": "#2 RENTAL SUPPLY WAVE", "detail": "Multifamily construction surged in 2021-22 when rents were rising and cap rates were low. Those buildings are now completing. Rental vacancy has climbed from 5.6% to 7.3% and absorption has slowed. Morningstar is cautious on multifamily in 2027." },
+        { "title": "#3 RATE CUTS HELP VOLUMES BEFORE PRICES", "detail": "Rates fall -> lock-in loosens -> more owners list -> supply rises -> prices may not rise much even with cheaper mortgages." }
+      ],
+      "indicators": {
+        "list": ["Months of supply", "Rental vacancy", "Housing starts and completions", "Share of low-rate mortgages"],
+        "sources": "US Census Bureau, NAR, FHFA (US); Eurostat, national agencies, local brokers (Europe)."
+      },
+      "scenarios": [
+        { "scenario": "Supply and vacancy rise (more inventory, more empty flats)", "whatHappens": "Sellers and landlords cut prices and rents; incentives grow", "helped": "Buyers and tenants", "hurt": "Homebuilders, rental landlords, multifamily developers", "netRead": "Bearish short term; it sows the seeds of a supply shortage later" },
+        { "scenario": "Supply and vacancy fall (tight market)", "whatHappens": "Prices and rents rise; deals happen faster", "helped": "Owners, landlords, builders", "hurt": "Buyers, tenants, regulators step in", "netRead": "Bullish for owners; policy risk rises" },
+        { "scenario": "Lock-in loosens (rates fall, time passes)", "whatHappens": "More owners list, so more existing homes for sale and more sales", "helped": "Transactions volume, brokers, builders over time, movers", "hurt": "Prices (more supply can limit gains)", "netRead": "Cuts help volumes first, prices later" },
+        { "scenario": "Lock-in tightens (rates rise again)", "whatHappens": "Fewer listings; fewer sales; prices held up by scarcity", "helped": "Existing owners' prices", "hurt": "Sales volumes, brokers, builders, movers", "netRead": "Bearish for volumes; the report says 63% of mortgages are at 5% or less" }
+      ],
+      "currentSituation": {
+        "USA": [],
+        "EU": [
+          { "indicator": "Mortgage lock-in effect", "situation": "Much smaller in Europe than in the US. Most European mortgages are variable-rate or fixed for only 5-10 years, unlike the US's typical 30-year fixed rate -- so far fewer European owners are stuck holding onto an old cheap rate.", "provenance": "added", "source": "General mortgage-market knowledge", "sourceDate": "2026-10-22" }
+        ]
+      }
+    },
+
+    {
+      "id": "policy",
+      "name": "Government Policy and Regulation",
+      "provenance": "notes",
+      "sourcePages": [18, 19, 20],
+      "segmentsHit": ["residential", "homebuilding", "property_developers", "office", "retail", "reits_general", "building_products"],
+      "segmentsHitRaw": "Residential rental (rent control); Homebuilding and developers (zoning, permits, impact fees); Office and retail (energy-efficiency rules); REITs (tax regimes); Building products (tariffs and subsidies)",
+      "whyItMatters": "Zoning and permitting cap supply. Rent rules cap income. Energy rules force spending on buildings. Taxes and subsidies change the cost of owning. Policy is slow to change but, once it does, it resets returns for years.",
+      "direction": {
+        "up": "Pro-supply reform helps builders and renters but can cap existing-owner gains. Tax relief and subsidies help demand.",
+        "down": "Rent caps and tough energy rules hurt landlord returns."
+      },
+      "backdrop": "Policy usually changes after a political reaction to a visible problem: unaffordable rents, housing shortages, climate targets or high energy bills. Expect the strongest reaction after rents or prices have risen sharply.",
+      "example": "A city freezes rents for three years. Tenants are happy, but landlords can no longer pass on higher costs, so they stop maintaining, sell, or convert flats to offices or hotels. Fewer rental homes are built in the next cycle.",
+      "watchouts": [
+        { "title": "#1 ZONING AND SUPPLY (the notes misspell this \"zooming\")", "detail": "Zoning decides what can be built where. Strict rules and slow permits mean less gets built, keeping prices high. Loosening those rules builds more supply, but only after a long delay. That helps builders and renters, but can slow price growth for people who already own homes." },
+        { "title": "#2 RENT CONTROL", "detail": "Caps on rent increases protect tenants but reduce landlord income and returns. Investors then price in lower growth and may avoid regulated markets. Over time, supply of rental homes falls. Look at whether new buildings are exempt, whether caps are indexed to inflation, and how often rules change." },
+        { "title": "#3 ENERGY AND CLIMATE RULES", "detail": "Buildings are a large source of emissions. Rules requiring better energy ratings push owners to spend capital on insulation and heating systems. Owners of older, poorly rated offices and homes face the biggest costs, and those assets may trade at a discount (a 'brown discount'). Owners of efficient buildings can gain. Links to energy prices (Inflation factor)." }
+      ],
+      "indicators": {
+        "list": ["Zoning and permit reforms", "Rent regulation bills", "Energy-efficiency deadlines", "Tax changes", "Tariff announcements"],
+        "sources": "Government and legislative trackers, EU Commission, national housing ministries, law-firm briefings."
+      },
+      "scenarios": [
+        { "scenario": "Zoning and permits eased", "whatHappens": "More homes can be built, faster", "helped": "Builders, renters, building products", "hurt": "Existing owners' price gains (more competition)", "netRead": "Good for builders and renters, mixed for owners" },
+        { "scenario": "Zoning and permits tightened", "whatHappens": "Fewer homes get built", "helped": "Existing owners", "hurt": "Builders, renters, buyers", "netRead": "Good for existing owners, bad for builders" },
+        { "scenario": "Rent caps introduced or tightened", "whatHappens": "Landlord income growth is limited", "helped": "Tenants", "hurt": "Landlords, rental REITs, rental developers", "netRead": "Bearish for rental REITs in that market" },
+        { "scenario": "Rent caps relaxed", "whatHappens": "Landlords can reset rents to market", "helped": "Landlords, rental REITs", "hurt": "Tenants", "netRead": "Bullish for landlords, but reversal risk" },
+        { "scenario": "Energy efficiency rules tightened", "whatHappens": "Owners must spend on upgrades; old buildings lose value", "helped": "Efficient new buildings, insulation and heating makers", "hurt": "Owners of old office and flats", "netRead": "Pick efficient assets; avoid old ones" },
+        { "scenario": "Energy efficiency rules relaxed", "whatHappens": "Upgrade costs fall or are delayed", "helped": "Owners of old buildings", "hurt": "Efficient new buildings, upgrade makers", "netRead": "Helps older assets short term" }
+      ],
+      "currentSituation": {
+        "USA": [],
+        "EU": [
+          { "indicator": "EU building energy rules (EPBD, 2024)", "situation": "New buildings must produce zero emissions by 2030 (2028 for public buildings). For existing homes, countries must upgrade the worst-performing 16% by 2030, and the worst 26% by 2033. This is the rule behind the 'brown discount' in watch-out #3 below.", "provenance": "added", "source": "EU Directive (EU) 2024/1275 (EPBD recast)", "sourceDate": "2024 (directive; national transposition ongoing through 2026)" },
+          { "indicator": "Rent caps vary by country", "situation": "Germany caps rent increases in tight housing markets (the Mietpreisbremse). France caps rents in Paris, Lille, and other specific cities. Rules differ a lot by country and even by city -- there's no single EU-wide rent policy.", "provenance": "added", "source": "General regulatory knowledge, not independently re-verified against a live source this pass", "sourceDate": "2026-10-22" }
+        ]
+      }
+    },
+
+    {
+      "id": "credit",
+      "name": "Credit Conditions and Bank Lending",
+      "provenance": "notes",
+      "sourcePages": [20, 21, 22],
+      "segmentsHit": ["office", "property_developers", "construction_infra", "leveraged_reits", "multifamily_buyers", "homebuyers"],
+      "segmentsHitRaw": "Commercial real estate (office most, because lenders avoid it); Developers and construction (construction loans); Leveraged REITs; Multifamily buyers; Homebuyers (mortgage approval and spreads)",
+      "whyItMatters": "Property is bought and built with borrowed money. The policy rate sets the base cost, but lenders also decide how much to lend (LTV), at what spread, and whether to refinance at all. Credit can tighten even when rates fall.",
+      "direction": {
+        "up": "Easy credit (low spreads, high LTV, many lenders) helps prices and volumes.",
+        "down": "Tight credit (higher spreads, lower LTV, fewer lenders) hurts, and can trigger forced sales. Both effects arrive faster than demographic or supply changes."
+      },
+      "ltvDefinitionFlag": "The notes define LTV (loan-to-value) as Debt divided by Enterprise Value. The usual definition is Debt divided by Property Value -- for REITs, often Net Debt divided by Gross Asset Value.",
+      "backdrop": "After losses, a rate shock or a recession. A refinancing wall (many loans maturing at once) at much higher rates makes the problem worse. Credit loosens when spreads fall, banks regain confidence and rates drop.",
+      "example": "A landlord borrowed 70% of a building's value at 3%. The loan matures, rates are 6% and the bank now lends only 55%. The landlord must find the missing cash or sell, even though the building is the same.",
+      "watchouts": [
+        { "title": "#1 LENDER'S LEVERS", "detail": "Lenders decide (1) the rate or spread, (2) the loan-to-value (LTV) and (3) the minimum coverage, such as DSCR (debt service coverage ratio) and debt yield. When rates rise, DSCR falls even if the building is unchanged, so lenders cut the loan size -- a refinancing can require fresh equity even when the property performs well." },
+        { "title": "#2 BANK VS MARKET FUNDING", "detail": "Banks lend on their balance sheet and tighten quickly after losses. Capital markets (bonds, CMBS) reopen when spreads tighten. The US uses markets more, so it recovers faster. Europe's bank-led system reacts more slowly but with less volatility. Private credit funds now compete with banks, at higher prices." },
+        { "title": "#3 SIGNALS OF STRESS", "detail": "Rising delinquencies, falling loan origination, wider spreads on real estate bonds, more special servicing in CMBS, lender surveys showing tighter standards, and growing distressed sales. For credit investors, these show up in bond prices before they show up in property prices." }
+      ],
+      "indicators": {
+        "list": [],
+        "sources": "",
+        "provenance": "notes-empty",
+        "note": "'Indicators to watch' field header exists in the notes but is empty for this factor."
+      },
+      "scenarios": [
+        { "scenario": "Credit loosens (lower spreads, higher LTV, more lenders)", "whatHappens": "Deals get financed; refinancings go through; building restarts", "helped": "Developers, REITs, homebuyers, sellers", "hurt": "Little direct harm; the risk is overlending later", "netRead": "Bullish; the transmission belt of your thesis" },
+        { "scenario": "Credit tightens (higher spreads, lower LTV, fewer lenders)", "whatHappens": "Fewer deals; forced sales; projects stop", "helped": "Cash buyers, distressed investors, private credit lenders", "hurt": "Developers, leveraged REITs, office owners, homebuyers", "netRead": "Bearish even if policy rates fall" },
+        { "scenario": "Refinancing wall eased (rates fall, lenders extend)", "whatHappens": "Maturing loans can be refinanced; fewer forced sales", "helped": "Borrowers, mortgage and CMBS holders", "hurt": "Distressed buyers who find fewer bargains", "netRead": "Bullish for listed owners; fewer discounts for bargain hunters" },
+        { "scenario": "Refinancing wall hits at high rates", "whatHappens": "Weak assets cannot refinance; extend-and-pretend or sale", "helped": "Distressed buyers, special servicers, credit funds", "hurt": "Weak owners (older office), their lenders", "netRead": "Bearish for weak assets; opportunity for credit investors" }
+      ],
+      "currentSituation": {
+        "USA": [
+          { "indicator": "Fed policy stance", "situation": "Median FOMC projection points to further easing toward 4.1% by end-2026 as the labour market cools -- directionally supportive for credit conditions.", "provenance": "added", "source": "FRED / FOMC SEP, Sept 2026", "sourceDate": "2026-09" }
+        ],
+        "EU": [
+          { "indicator": "ECB Bank Lending Survey (Q2 2026)", "situation": "Banks got a bit more cautious: 9% tightened standards for home loans, 7% for business loans, 12% for consumer credit. They expect to keep tightening a little into Q3 2026, mainly because they're worried about the economy, not because funding itself got more expensive.", "provenance": "added", "source": "ECB euro area Bank Lending Survey", "sourceDate": "2026-07-21" }
+        ]
+      }
+    },
+
+    {
+      "id": "gdp",
+      "name": "GDP and the Business Cycle",
+      "provenance": "notes",
+      "sourcePages": [22, 23, 24],
+      "segmentsHit": ["office", "retail", "hospitality", "industrial_logistics", "data_centres", "towers", "homebuilding"],
+      "segmentsHitRaw": "Office (follows corporate profits and spending); Retail (follows corporate profits and spending); Hotels (follows corporate profits and spending); Logistics (trade and consumption); Data centres and towers (tech investment); Homebuilding (follows confidence, credit and jobs, and leads the cycle)",
+      "whyItMatters": "Growth drives jobs, profits and spending, which drive demand for every property type. The cycle also determines why rates move: cuts in a slowdown are very different from cuts after inflation cools. Real estate is cyclical and amplifies the economy's moves because of leverage.",
+      "direction": {
+        "up": "Steady growth helps.",
+        "down": "Recession hurts demand, but usually brings rate cuts. Boom and overheating end in higher rates and oversupply."
+      },
+      "backdrop": "The cycle matters most when it turns: from expansion to slowdown (rates high, credit tight) or from recession to recovery (rates falling, credit easing). Real estate usually reacts with a lag, except housing, which often turns first. The best entry point is often late in a slowdown, once cuts begin and before demand recovers.",
+      "example": "Companies earn less in a downturn and hire fewer people. They rent less office space and cancel expansions. A few quarters later, when the economy recovers and rates are lower, they start hiring and renting again.",
+      "watchouts": [
+        { "title": "#1 WHO LEADS AND WHO LAGS", "detail": "Housing and homebuilding tend to turn first, because mortgage rates and confidence react quickly. Logistics and retail follow consumer demand. Offices and hotels lag, because companies and travellers cut and restore budgets more slowly. Property values often bottom after the economy does." },
+        { "title": "#2 PHASES SUMMARISED", "detail": "Early recovery: rates are low, credit eases, housing rebounds first. -> Expansion: rents and occupancy rise, development starts. -> Late cycle: rates rise, costs climb, new supply arrives, growth slows. -> Recession: vacancy rises, rents fall, defaults rise, rates are cut. -> Your thesis assumes we move from late cycle to early recovery." },
+        { "title": "#3 CUTS FOR THE RIGHT OR WRONG REASON", "detail": "A cut because inflation fell is bullish: income stays intact and financing gets cheaper. A cut because the economy is collapsing is less so: tenants struggle to pay and lenders turn cautious, even if rates fall. Morningstar's view of a 2028-29 rebound assumes the first type." }
+      ],
+      "indicators": {
+        "list": ["GDP growth", "Corporate profits", "PMIs", "Yield curve", "Unemployment claims"],
+        "sources": "BEA and Fed (US); Eurostat, ECB and PMIs (Europe)."
+      },
+      "scenarios": [
+        { "scenario": "Growth strengthens steadily", "whatHappens": "Jobs, profits and spending rise; rents and occupancy rise", "helped": "Office, retail, hotels, logistics, rental, builders", "hurt": "Rate-sensitive assets, if growth revives inflation and delays cuts", "netRead": "Good for income, mixed for timing" },
+        { "scenario": "Growth slows but stays positive (soft landing)", "whatHappens": "Demand cools gently; inflation falls; central banks cut", "helped": "Rate-sensitive REITs, homebuilders, residential", "hurt": "Cyclical assets (hotels, retail) a little", "netRead": "The best case for your thesis" },
+        { "scenario": "Recession (contraction)", "whatHappens": "Layoffs, falling profits, rising vacancy and defaults", "helped": "Rate cuts, distressed buyers, defensive assets", "hurt": "Office, hotels, retail, leveraged owners, builders", "netRead": "Bearish short term; cuts come but demand falls first" },
+        { "scenario": "Recovery after recession", "whatHappens": "Rates are low, credit eases, housing rebounds first", "helped": "Homebuilding, residential, REITs with cheap assets, early buyers", "hurt": "Little harm; the risk is buying too early", "netRead": "Bullish, but only after the lag; the report expects 2028-29" }
+      ],
+      "currentSituation": {
+        "USA": [
+          { "indicator": "Labour market", "situation": "Unemployment rose to 4.2% (Sept 2026) with weak payroll growth (+29k) -- a cooling but not collapsing economy.", "provenance": "added", "source": "US BLS", "sourceDate": "2026-10-02" }
+        ],
+        "EU": [
+          { "indicator": "Composite PMI", "situation": "53.1 in September 2026 -- a 41-month high, the strongest private-sector expansion in almost 3.5 years.", "provenance": "added", "source": "S&P Global Eurozone Composite PMI", "sourceDate": "2026-10-01" },
+          { "indicator": "GDP growth", "situation": "The official Q3 2026 number comes out 30 Oct 2026. Forecasts expect about +0.3% for the quarter. Earlier quarters in 2026 grew 0.4-0.6%.", "provenance": "added", "source": "Eurostat / consensus forecasts", "sourceDate": "2026-10-22" },
+          { "indicator": "France", "situation": "The notes say growth has flattened -- that matches France lagging behind Nordic and Southern European real estate markets in 2026, and the French bond-market stress described under Rates.", "provenance": "added", "source": "Cushman & Wakefield / Aberdeen Investments European real estate outlooks", "sourceDate": "2026" },
+          { "indicator": "Germany", "situation": "Real estate investment into Germany stayed weak in 2026, similar to France, while Nordic and Southern European markets did better.", "provenance": "added", "source": "Cushman & Wakefield European Outlook 2026", "sourceDate": "2026" },
+          { "indicator": "Nordics", "situation": "Sweden saw one of the strongest increases in real estate investment in Europe in 2026. The Nordics are also becoming a hub for AI data centres, thanks to abundant power -- relevant since Niam and NREP, two Nordic-focused funds in the Funds & Picks section, operate here.", "provenance": "added", "source": "Cushman & Wakefield European Outlook 2026", "sourceDate": "2026" },
+          { "indicator": "UK", "situation": "One of the strongest markets for warehouse/logistics rent growth (2026-27), alongside Spain and Sweden. Offices are split sharply between in-demand modern buildings and outdated ones sitting empty -- a pattern seen across Europe (over 14% of office space is vacant, mostly older stock).", "provenance": "added", "source": "Cushman & Wakefield European Outlook 2026", "sourceDate": "2026" },
+          { "indicator": "Southern Europe", "situation": "Spain had the strongest growth in real estate investment in Europe in 2026, alongside Sweden, and (with the Netherlands) is expected to lead rent growth for housing.", "provenance": "added", "source": "Cushman & Wakefield European Outlook 2026", "sourceDate": "2026" }
+        ]
+      }
+    },
+
+    {
+      "id": "rates",
+      "name": "Interest Rates",
+      "provenance": "notes",
+      "sourcePages": [4, 5, 6],
+      "segmentsHit": ["office_reits", "homebuilding", "property_developers", "highly_leveraged_distressed_reits", "logistics_industrial_reits", "retail_shopping_centre_reits", "healthcare", "data_centres", "towers", "construction_infra", "property_mgmt_services"],
+      "segmentsHitRaw": "Not given as a single list in the notes -- this factor IS the organising variable of the whole thesis, so segmentsHit mirrors the SEED DATA /10 rate-impact ranking across all business-model segments.",
+      "whyItMatters": "Opens with a typo in the notes: 'The first one and most impactful is definitely real estate...' -- should read 'the most impactful is definitely interest rates'. The actual content explains REITs (debt, valuations/cap rates, shareholder leverage amplification, competition with govt bonds) and homebuilders (mortgage affordability, both-sides margin squeeze, operating leverage) as the two most rate-sensitive business types, ranked 'from most impacted to least impacted'.",
+      "reitMechanics": [
+        { "reason": "DEBT", "detail": "REITs buy properties worth hundreds of millions or billions, often financing part of those purchases with borrowed money. When interest rates rise: refinancing debt becomes more expensive -> interest expenses increase over time -> less cash may be available for shareholders." },
+        { "reason": "VALUATIONS", "detail": "Properties are commonly valued by dividing annual net operating income by the return investors require (the capitalization rate, or cap rate). Valuation is implied by the yield INVESTORS DEMAND, which is generally above government bond yields -- which is why the two are very connected." },
+        { "reason": "SHAREHOLDERS (leverage amplification)", "detail": "A REIT has EUR1b of property assets and EUR400m of debt (NAV = EUR600m). If property value falls 10% to EUR900m, debt stays at EUR400m, so NAV falls to EUR500m -- a 16.7% NAV decline from a 10% asset decline. If property value rises 10%, the notes state 'Property Assets: EUR1.05b' -- but 1b + 10% = EUR1.10b, and only EUR1.10b minus EUR400m = EUR700m reproduces the stated +16.7% NAV move (EUR600m -> EUR700m). The EUR1.05b figure is an arithmetic error in the notes." },
+        { "reason": "GOVERNMENT (competing yields)", "detail": "REIT dividends compete with government bonds. If a REIT offers a 5% dividend yield and government bonds yield 2%, the REIT looks attractive. If government bonds also yield 5%, investors can get a similar yield at lower risk from the bond." }
+      ],
+      "homebuilderMechanics": [
+        { "reason": "MORTGAGE AFFORDABILITY", "detail": "A buyer wants a EUR400,000 house with a EUR320,000 mortgage over 30 years. At 3%: EUR1,349/month. At 5%: EUR1,718/month. At 7%: EUR2,129/month -- about 58% more per month for the same mortgage when the rate goes from 3% to 7%." },
+        { "reason": "BOTH SIDES SQUEEZED", "detail": "Demand falls: higher mortgage payments mean fewer buyers can afford new houses. Costs rise: construction and land financing become more expensive when debt is repriced." },
+        { "reason": "PROFITS VS SALES (operating leverage)", "detail": "A homebuilder sells houses for EUR400,000 and spends EUR360,000 building and selling each one -- profit EUR40k. If rates rise and buyers can't afford the same mortgage, the builder cuts price 5% to EUR380,000; profit falls from EUR40k to EUR20k -- a 50% profit decline from a 5% price cut. This is operating leverage: small changes in revenue can produce much larger percentage changes in profit." }
+      ],
+      "watchouts": [
+        { "title": "No 'Links to other factors' in the notes for Rates", "detail": "Unlike the other 9 factors, the notes do not give Rates its own outbound 'Links to other factors' list. edges.json carries 5 PROPOSED outbound links (-> Credit, Construction Costs, Supply, Confidence, GDP) for you to confirm or edit." }
+      ],
+      "indicators": {
+        "list": ["ECB deposit rate & forward guidance", "10y Bund / OAT / BTP yields", "Prime cap rates vs risk-free rate spread", "EPRA Europe discount-to-NAV"],
+        "sources": "ECB Data Portal, national debt agencies, EPRA/MSCI.",
+        "provenance": "proposed"
+      },
+      "scenarios": [],
+      "currentSituation": {
+        "USA": [
+          { "indicator": "Fed funds rate", "situation": "FOMC median projection for end-2026 is 4.1%; labour-market cooling (unemployment to 4.2%, weak Sept payrolls) is the main argument for cuts.", "provenance": "added", "source": "FRED / FOMC Summary of Economic Projections, Sept 2026", "sourceDate": "2026-09" }
+        ],
+        "EU": [
+          { "indicator": "ECB deposit facility rate", "situation": "2.50% as of October 2026, up from 2.00% a year ago. The ECB has been raising rates, not cutting them, as inflation picked back up. Markets expect no change at the 29 Oct 2026 meeting (about 93% odds of a hold).", "provenance": "added", "source": "ECB / rate trackers (macroradar.io, euribor-rates.info, gimstamumas.lt)", "sourceDate": "2026-10-16" },
+          { "indicator": "10y Bund yield", "situation": "~3.40% (21 Oct 2026).", "provenance": "added", "source": "Trading Economics", "sourceDate": "2026-10-21" },
+          { "indicator": "10y OAT yield / France-Germany spread", "situation": "France's 10-year bond yield broke above 5% -- the highest since 2002 -- amid a budget standoff and protests. The gap between French and German bond yields widened sharply to about 1.6 percentage points, matching the notes' claim that this gap is at its widest since the Eurozone crisis. This is the clearest real-world sign that European yields are under real stress, though it's driven by France's own political problems, not a broad European rate move.", "provenance": "added", "source": "TradingEconomics, Yahoo Finance, ideal-investisseur.fr OAT/Bund tracker", "sourceDate": "2026-10-21" }
+        ]
+      }
+    }
+  ]
+}
